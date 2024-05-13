@@ -1,0 +1,157 @@
+{% load static %}
+
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="{% url 'staff_home' %}" class="brand-link">
+        <img src="{% static 'dist/img/peclogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+            style="opacity: .8">
+        <span class="brand-text font-weight-light">PEC</span>
+      </a>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
+          <div class="image ">
+            {% if staff.profile_picture %}
+                  <img src="{{ staff.profile_picture.url }}" >
+              {% else %}
+                  <p>No profile picture available</p>
+              {% endif %}
+          </div>
+          <div class="info">
+            <a class="d-block" style="margin-left: 10px; font-size: 16px; font-weight: bold; color: #FFFFFF;">
+              {{ user.first_name }} {{ user.last_name }}
+            </a>
+          </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Add icons to the links using the .nav-icon class
+                with font-awesome or any other icon font library -->
+                
+                <li class="nav-item">
+                  {% url 'staff_profile' as staff_profile %}
+                  <a href="{{ staff_profile }}" class="nav-link {% if request.path == staff_profile %} active {% endif %}">
+                      <i class="nav-icon fas fa-user"></i> <!-- Change the icon if needed -->
+                      <p>
+                          Staff Profile
+                      </p>
+                  </a>
+                </li>
+            <li class="nav-item">
+              {% url 'staff_home' as staff_home %}
+              <a href="{{ staff_home }}" class="nav-link {% if request.path == staff_home %} active {% endif %}">
+                <i class="nav-icon fas fa-home"></i>
+                <p>
+                  Home
+                  {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                </p>
+              </a>
+            </li>
+            {% url 'staff_add_publication' as staff_add_publication %}
+            {% url 'staff_add_certifications' as staff_add_certifications %}
+            {% url 'staff_add_achievement' as staff_add_achievement %}
+            {% url 'staff_add_AC' as staff_add_AC %}
+            <li class="nav-item has-treeview ">
+              <a href="#" class="nav-link {% if request.path == staff_add_publication or request.path == staff_add_AC or request.path == staff_add_certifications %}active{% endif %}">
+                <i class="nav-icon fas fa-plus"></i>
+                <p>
+                  Add
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{% url 'staff_add_publication' %}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Publications</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'staff_add_AC' %}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Academic Contribution</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'staff_add_projects' %}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Projects</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'staff_add_certifications' %}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Certifications</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'staff_add_achievement' %}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Achievements</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            
+            
+              <!-- View Publications link -->
+              {% url 'staff_view_publications' as staff_view_publication %}
+              {% url 'staff_view_certifications' as staff_view_certifications %}
+              {% url 'staff_view_academic_contribution' as view_academic_contribution %}
+              <li class="nav-item has-treeview">
+                <a href="#" class="nav-link {% if request.path == staff_view_publication or request.path == view_academic_contribution or request.path == staff_view_certifications %}active{% endif %}">
+                  <i class="nav-icon fas fa-eye"></i>
+                  <p>
+                    View
+                    <i class="right fas fa-angle-left"></i> <!-- Icon for indicating a dropdown -->
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    {% url 'staff_view_publications' as staff_view_publications %}
+                    <a href="{{ staff_view_publications }}"class="nav-link" >
+                      <i class="far fa-circle nav-icon"></i> <!-- Smaller icon for dropdown items -->
+                      <p>Publications</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    {% url 'staff_view_academic_contribution' as view_academic_contribution %}
+                    <a href="{{ view_academic_contribution }}"class="nav-link" >
+                      <i class="far fa-circle nav-icon"></i> <!-- Smaller icon for dropdown items -->
+                      <p>Academic Contribution</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    {% url 'staff_view_project' as staff_view_project %}
+                    <a href="{{ staff_view_project }}"class="nav-link" >
+                      <i class="far fa-circle nav-icon"></i> <!-- Smaller icon for dropdown items -->
+                      <p>Projects</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    {% url 'staff_view_certifications' as staff_view_certifications %}
+                    <a href="{{ staff_view_certifications }}"class="nav-link" >
+                      <i class="far fa-circle nav-icon"></i> <!-- Smaller icon for dropdown items -->
+                      <p>Certifications</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    {% url 'staff_view_achievements' as staff_view_achievements %}
+                    <a href="{{ staff_view_achievements }}"class="nav-link" >
+                      <i class="far fa-circle nav-icon"></i> <!-- Smaller icon for dropdown items -->
+                      <p>Achievements</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              
+          </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+      </div>
+      <!-- /.sidebar -->
+    </aside>

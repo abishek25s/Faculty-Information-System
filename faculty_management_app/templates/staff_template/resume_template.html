@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .resume-container {
+            max-width: 1000px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        header .details {
+            text-align: left;
+            width: 70%;
+        }
+        header p {
+            font-size: 16px;
+            margin-bottom: 5px;
+            margin-right: 20px;
+        }
+        .profile-picture-container {
+            flex: 0 0 30%;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .profile-picture {
+            margin-top: 20px;
+        }
+        .profile-picture img {
+            max-width: 150px;
+            height: auto;
+        }
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        section {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        section h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #007bff;
+            border-bottom: 1px solid #007bff;
+            padding-bottom: 5px;
+        }
+        section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        section ul li {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        section ul li a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        section ul li a:hover {
+            text-decoration: underline;
+        }
+        .star {
+            color: gold;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card card-primary card-outline">
+                <div class="card-body">
+                    <div class="resume-container">
+                        <div class="row">
+                            <div class="col-12">
+                                <header>
+                                    <div class="details">
+                                        <h1>{{staff.salutation}}.{{ user.first_name }} {{ user.last_name }}</h1>
+                                        <p>Designation: {{ staff.designation }}</p>
+                                        <p>Email: {{ user.email }}</p>
+                                        <p>Phone: {{ staff.phone }}</p>
+                                    </div>
+                                    <div class="profile-picture-container">
+                                        {% if profile_picture_base64 %}
+                                        <div class="profile-picture">
+                                            <img src="data:image/png;base64,{{ profile_picture_base64 }}" class="card1" style="width: 150px;">
+                                        </div>
+                                        {% else %}
+                                        <p>No profile picture available</p>
+                                        {% endif %}
+                                    </div>
+                                </header>
+                            </div>
+                        </div>
+                        <main>
+                            <section>
+                                <h2>Qualifications</h2>
+                                <ul>
+                                    {% for qualification in staff.qualifications.all %}
+                                    <li>{{ qualification.degree }} in {{ qualification.stream }}, Graduated in {{ qualification.year_of_graduation }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </section>
+                            <section>
+                                <h2>Experiences</h2>
+                                <ul>
+                                    {% for experience in staff.experiences.all %}
+                                    <li>{{ experience.organization }} as {{ experience.designation }}, from {{ experience.from_date|date:"Y-m-d" }} to {{ experience.to_date|date:"Y-m-d" }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </section>
+                            <section>
+                                <h2>Current Working</h2>
+                                <ul>
+                                    <li>{{ staff.current_experience.organization }} as {{ staff.designation }}, from {{ staff.current_experience.from_date|date:"Y-m-d" }} to Present</li>
+                                </ul>
+                            </section>
+                            <section>
+                                <h2>External Links</h2>
+                                <ul>
+                                    <li>Scopus: <a href="{{ staff.scopus_website }}">{{ staff.scopus_website }}</a></li>
+                                    <li>Google Scholar: <a href="{{ staff.google_website }}">{{ staff.google_website }}</a></li>
+                                </ul>
+                            </section>
+                            <section>
+                                <h2>Contributions</h2>
+                                <ul>
+                                    <li> Journals Published: {{ journal_count }}</li>
+                                    <li> Conference Papers: {{ conference_count }}</li>
+                                    <li> Books: {{ book_count }}</li>
+                                    <li> Books Chapters: {{ book_chapter_count }} </li>
+                                    <li> Copyrights: {{ copyright_count }} </li>
+                                    <li> Patents: {{ patent_count }} </li>
+                                </ul>
+                            </section>
+                        </main>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

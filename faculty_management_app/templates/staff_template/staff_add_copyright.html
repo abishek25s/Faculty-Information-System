@@ -1,0 +1,244 @@
+<!-- Include Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Include Font Awesome for calendar icon -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- Include Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    Add Copyright
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<style>
+    .button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #000080;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 16px; /* Reduced font size */
+        padding: 10px 20px; /* Reduced padding */
+        width: auto; /* Adjusted width */
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .button span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .button span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+
+    .button:hover span {
+        padding-right: 25px;
+    }
+
+    .button:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+</style>
+
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    
+                    <!-- /.card-header -->
+
+                    {% comment %} Display Messages {% endcomment %}
+                    {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'staff_add_copyright_save' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+
+                            <div class="row">
+                            <!-- New Set of Input Fields -->
+                            <div class="form-group col-md-12">
+                                <label>Author(s)</label>
+                                <input type="text" name="authors" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Work Title</label>
+                                <input type="text" name="work_title" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Category</label>
+                                <input type="text" name="category" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Status</label>
+                                <input type="text" name="status" class="form-control" />
+                            </div>
+
+
+                            <div class="form-group col-md-6">
+                                <label>Filed/Applied Date</label>
+                                <div class="input-group">
+                                    <input type="text" id="filed_applied_date" name="filed_applied_date" class="form-control" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text calendar-icon" id="calendar-icon-filed">
+                                            <i class="fas fa-calendar"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group col-md-6">
+                                <label>Registered/Published Date</label>
+                                <div class="input-group">
+                                    <input type="text" id="registered_published_date" name="registered_published_date" class="form-control" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text calendar-icon" id="calendar-icon-published">
+                                            <i class="fas fa-calendar"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            
+                            <div class="form-group col-md-6">
+                                <label>Registration No</label>
+                                <input type="text" name="registration_no" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Dairy No</label>
+                                <input type="text" name="dairy_no" class="form-control" />
+                            </div>
+                            <!-- End of New Set of Input Fields -->
+
+                        </div>
+                    </div>
+
+                    <!-- Card Footer and Submit Button -->
+                    <div class="text-center">
+                        <button id="add_publication_button" class="button" style="vertical-align:middle"><span>Add Copyright </span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    document.querySelector('form').addEventListener('submit', function (event) {
+        var filedAppliedDateInput = document.getElementById('filed_applied_date');
+        var registeredPublishedDateInput = document.getElementById('registered_published_date');
+
+        var filedAppliedDate = new Date(filedAppliedDateInput.value);
+        var registeredPublishedDate = new Date(registeredPublishedDateInput.value);
+
+        if (registeredPublishedDate <= filedAppliedDate) {
+            alert('Registered/Published date must be after Filed/Applied date.');
+            event.preventDefault();
+            return;
+        }
+
+        var requiredFields = ['authors', 'work_title', 'category', 'status', 'filed_applied_date', 'registered_published_date', 'registration_no', 'dairy_no'];
+        var filled = true;
+        requiredFields.forEach(function(field) {
+            var input = document.querySelector('[name="' + field + '"]');
+            if (!input.value.trim()) {
+                filled = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        if (!filled) {
+            event.preventDefault();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var filedAppliedDateInput = document.getElementById('filed_applied_date');
+        var registeredPublishedDateInput = document.getElementById('registered_published_date');
+
+        var filedAppliedDatePicker = flatpickr(filedAppliedDateInput, {
+            dateFormat: "Y-m-d", 
+            disableMobile: true, 
+            maxDate: 'today', 
+        });
+
+        var registeredPublishedDatePicker = flatpickr(registeredPublishedDateInput, {
+            dateFormat: "Y-m-d", 
+            disableMobile: true,
+            maxDate: 'today', 
+        });
+
+        filedAppliedDatePicker.config.onChange.push(function(selectedDates, dateStr, instance) {
+            registeredPublishedDatePicker.set('minDate', dateStr);
+        });
+
+        document.querySelector('form').addEventListener('submit', function (event) {
+            var today = new Date();
+            var filedAppliedDate = new Date(filedAppliedDateInput.value);
+
+            if (filedAppliedDate > today) {
+                alert('Filed/Applied date cannot exceed present date.');
+                event.preventDefault();
+                return;
+            }
+        });
+    });
+</script>
+{% endblock custom_js %}

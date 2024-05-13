@@ -1,0 +1,395 @@
+{% extends 'hod_template/base_template.html' %}
+{% block main_content %}
+{% load static %}
+<style>
+  .card-header {
+    background-color: grey !important; 
+  }
+
+  .content {
+    animation: fadeIn 1.0s ease-in-out; /* Adjust timing and easing as needed */
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .title-content {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .welcome-message {
+    font-size: 24px;
+    color: #333;
+    font-weight: bold;
+  }
+  .experience-section {
+    background-color: #f9f9f9;
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  .experience-section .form-group {
+    margin-bottom: 20px;
+  }
+
+  .experience-section .btn-group .btn {
+    margin-right: 10px;
+  }
+
+</style>
+<section class="title-content">
+    <h1 class="welcome-message">Welcome Dr. {{ user.first_name }} {{ user.last_name }}!</h1>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ staff_count }}</h3>
+                        <p>Total Faculty</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <a href="{% url 'manage_staff' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>{{ total_count }}</h3>
+                        <p>Total Publications</p>
+                    </div>
+                    <div class="icon">
+                        <i class="far fa-newspaper"></i>
+                    </div>
+                    <a href="{% url 'view_publications' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>    
+            <div class="col-lg-3">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>{{ total_ac_count }}</h3>
+                        <p>Total Academic Contribution</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <a href="{% url 'view_academic_contribution' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>    
+            <div class="col-lg-3">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{ total_project_count }}</h3>
+                        <p>Total Projects</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <a href="{% url 'view_projects' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>    
+        </div>        
+    </div>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Scopus publications per Academic Year</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="barChart" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Faculty Development Programs per Academic Year</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="fdpBarChart" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Publications: CAY vs Average no.of publications of past 5 years</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="publicationChart" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div> 
+</section><br>
+<section class="experience-section">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-group text-center">
+                    <input type="number" class="form-control" id="yearInput" placeholder="Enter a number  that represents a year of experience">
+                </div>
+                <div class="btn-group d-flex justify-content-between" role="group" aria-label="Year comparison buttons">
+                    <button type="button" class="btn btn-primary" onclick="filterFaculty('<')">Less Than</button>
+                    <button type="button" class="btn btn-primary" onclick="filterFaculty('=')">Equal To</button>
+                    <button type="button" class="btn btn-primary" onclick="filterFaculty('>')">Greater Than</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Staff Experience Details</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0" id="publicationTable">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Faculty Name</th>
+                                    <th>Designation</th>
+                                    <th>Years of Experience</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- js does this job -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-danger">
+                    <div class="card-header">
+                        <h3 class="card-title">Staff Experience Pie Chart</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function filterFaculty(operator) {
+        var years = parseInt(document.getElementById('yearInput').value);
+        $.ajax({
+            url: '{% url "filter_faculty_by_experience" %}',
+            method: 'GET',
+            data: { 'years': years, 'operator': operator },
+            success: function (data) {
+                updateFacultyTable(data.experiences);
+                updatePieChart(data.pie_chart_data); // Update faculty table with filtered data
+            },
+            error: function (error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+    function updateFacultyTable(data) {
+        var tableBody = $('#publicationTable tbody');
+        tableBody.empty(); // Clear existing rows
+        data.forEach(function (staff) {
+            var rowHtml = '<tr>' +
+                '<td>' + staff.staffName + '</td>' +
+                '<td>' + staff.designation + '</td>' +
+                '<td>' + staff.experiences + '</td>' +
+                '</tr>';
+            tableBody.append(rowHtml);
+        });
+    }
+    function generateRandomColor() {
+        return '#' + Math.floor(Math.random()*16777215).toString(16);
+    }
+    
+    function updatePieChart(data) {
+        var pieChartCanvas = document.getElementById('pieChart');
+        if (window.myPieChart !== undefined) {
+            window.myPieChart.destroy();
+        }
+        var ctx = pieChartCanvas.getContext('2d');
+        var labels = data.map(function(staff) {
+            return staff.staffName + ' : ' + staff.experiences + ' years';
+        });
+        var dataValues = data.map(function(staff) {
+            return staff.experiences;
+        });
+    
+        var backgroundColors = [];
+        for (var i = 0; i < data.length; i++) {
+            backgroundColors.push(generateRandomColor());
+        }
+    
+        var pieChartData = {
+            labels: labels,
+            datasets: [{
+                data: dataValues,
+                backgroundColor: backgroundColors,
+                borderColor: backgroundColors, // Match border color to background color
+                borderWidth: 1
+            }]
+        };
+    
+        // Check if pieChart already exists and destroy it
+        if (pieChart && typeof pieChart.destroy === 'function') {
+            pieChart.destroy();
+        }
+    
+        pieChart = new Chart(pieChartCanvas, {
+            type: 'pie',
+            data: pieChartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            var label = data.labels[tooltipItem.index];
+                            return label;
+                        }
+                    }
+                },
+                legend: {
+                    display: false // Hide the legend
+                }
+            }
+        });
+    }
+</script>
+<script>
+    var barChartCanvas = $('#barChart').get(0).getContext('2d');
+    var academic_years = {{ academic_years|safe }};
+    var scopus_count = {{ scopus_count|safe }};   
+    var barChartData = {
+        labels: academic_years,
+        datasets: [
+            {
+                label: 'Scopus Published',
+                backgroundColor: 'pink',
+                borderColor: 'rgba(0,128,0,0.8)',
+                pointRadius: false,
+                pointColor: '#3b8bba',
+                pointStrokeColor: 'rgba(60,141,188,1)',
+                pointHighlightFill: '#fff',
+                pointHighlightStroke: 'rgba(60,141,188,1)',
+                data: scopus_count,
+            },
+        ]
+    };
+    var barChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false
+    };
+    var barChart = new Chart(barChartCanvas, {
+        type: 'bar',
+        data: barChartData,
+        options: barChartOptions
+    });
+</script>
+<script>
+    var barChartCanvas = $('#fdpBarChart').get(0).getContext('2d');
+    var academic_years = {{ academic_years|safe }};
+    var fdp_count = {{ fdp_count|safe }};
+    var totalFDP = fdp_count.reduce((acc, curr) => acc + curr, 0);
+    var averageFDP = totalFDP / academic_years.length;
+    var averageFDPArray = Array(academic_years.length).fill(averageFDP);
+    var barChartData = {
+        labels: academic_years,
+        datasets: [
+            {
+                label: 'FDP Attended (Current Year)',
+                backgroundColor: 'skyblue',
+                borderColor: 'rgba(60,141,188,0.8)',
+                pointRadius: false,
+                pointColor: '#3b8bba',
+                pointStrokeColor: 'rgba(60,141,188,1)',
+                pointHighlightFill: '#fff',
+                pointHighlightStroke: 'rgba(60,141,188,1)',
+                data: fdp_count,
+            },
+            {
+                label: 'Average FDP Count (5 Years)',
+                backgroundColor: 'orange',
+                borderColor: 'rgba(255,0,0,0.8)',
+                pointRadius: false,
+                pointColor: '#FF0000',
+                pointStrokeColor: 'rgba(255,0,0,1)',
+                pointHighlightFill: '#fff',
+                pointHighlightStroke: 'rgba(255,0,0,1)',
+                data: averageFDPArray,
+            },
+        ]
+    };
+    var barChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false
+    };
+    var barChart = new Chart(barChartCanvas, {
+        type: 'bar',
+        data: barChartData,
+        options: barChartOptions
+    });
+</script>
+<script>
+    var publicationChartCanvas = $('#publicationChart').get(0).getContext('2d');
+    var academic_years = {{ academic_years|safe }};
+    var publication_count = {{ publication_count|safe }};
+    var totalPublications = publication_count.reduce((acc, curr) => acc + curr, 0);
+    var publicationChartData = {
+        labels: academic_years,
+        datasets: [
+            {
+                label: 'Publications (Current Year)',
+                backgroundColor: 'rgba(0,128,0,0.9)',
+                borderColor: 'rgba(0,128,0,0.8)',
+                pointRadius: false,
+                pointColor: '#3b8bba',
+                pointStrokeColor: 'rgba(60,141,188,1)',
+                pointHighlightFill: '#fff',
+                pointHighlightStroke: 'rgba(60,141,188,1)',
+                data: publication_count,
+            },
+        ]
+    };
+    var publicationChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false
+    };
+    var publicationChart = new Chart(publicationChartCanvas, {
+        type: 'line',
+        data: publicationChartData,
+        options: publicationChartOptions
+    });
+</script>
+{% endblock main_content %}

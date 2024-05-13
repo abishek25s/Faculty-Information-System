@@ -1,0 +1,219 @@
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+Copyrights
+{% endblock page_title %}
+
+{% block main_content %}
+{% load static %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.21/jspdf.plugin.autotable.min.js"></script>
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Filter form -->
+            <div class="card">
+                <div class="card-header">
+                    <form action="{{ request.path }}" method="get">
+                        <label for="academic_year">Filter by Academic Year:</label>
+                        <select name="academic_year" id="academic_year">
+                            <option value="">All</option>
+                            {% for year in academic_years %}
+                                <option value="{{ year }}" {% if year == selected_academic_year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-default btn-sm"><i class="fas fa-filter"></i> Filter</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Books table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Copyright Details</h3>
+                    <div class="card-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                            <input type="text" id="table_search" name="table_search" class="form-control float-right" placeholder="Search">
+
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap" id="publicationsTable">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>AUTHOR(s)</th>
+								<th>WORK TITLE</th>
+                                <th>CATEGORY</th>
+                                <th>FILED / APPLIED DATE</th>
+                                <th>REGISTERED / PUBLISHED DATE</th>
+                                <th>STATUS</th>
+                                <th>REGISTRATION NO.</th>
+                                <th>DAIRY NO</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for copyright in copyrights %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ copyright.authors }}</td>
+                                    <td>{{ copyright.work_title }}</td>
+                                    <td>{{ copyright.category }}</td>
+                                    <td>{{ copyright.filed_applied_date }}</td>
+                                    <td>{{ copyright.registered_published_date }}</td>
+                                    <td>{{ copyright.status }}</td>
+                                    <td>{{ copyright.registration_no }}</td>
+                                    <td>{{ copyright.dairy_no }}</td>
+                                    <td><a href="{% url 'delete_copyright' copyright.id %}" class="btn btn-danger btn-icon-only" ><i class="fas fa-trash-alt"></i></a></td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="8">No copyrights found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="download-options" style="margin-bottom: 20px;">
+        <div style="text-align:end;">
+            <!-- Button triggers the JavaScript function to download the table as Excel -->
+            <button onclick="downloadTableAsExcel()" class="btn btn-success">Download as Excel</button>
+            <!-- Button triggers the JavaScript function to download the table as PDF -->
+            <button onclick="downloadTableAsPDF()" class="btn btn-danger">Download as PDF</button>
+        </div>
+    </div>
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script>
+    function downloadTableAsExcel() {
+        var table = document.getElementById("publicationsTable");
+        if (!table) {
+            console.error('Table element not found.');
+            return;
+        }
+    
+        var wb = XLSX.utils.table_to_book(table, {sheet:"Sheet JS", raw:true});
+    
+        var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:true, type: 'binary'});
+    
+        function s2ab(s) {
+            var buf = new ArrayBuffer(s.length);
+            var view = new Uint8Array(buf);
+            for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        }
+    
+        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), "My_copyrights.xlsx");
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('table_search');
+        input.addEventListener('input', function() {
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById('publicationsTable');
+            var rows = table.getElementsByTagName('tr');
+    
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                var found = false;
+                for (var j = 0; j < cells.length; j++) {
+                    var cell = cells[j];
+                    if (cell) {
+                        var textValue = cell.textContent || cell.innerText;
+                        if (textValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (found) {
+                    rows[i].style.display = '';
+                } else {
+                    if (rows[i].getElementsByTagName('th').length === 0) {
+                        rows[i].style.display = 'none';
+                    } else {
+                        rows[i].style.display = '';
+                    }
+                }
+            }
+        });
+    });
+    
+    function downloadTableAsPDF() {
+        var filter = document.getElementById('table_search').value.toUpperCase();
+        var table = document.getElementById("publicationsTable");
+        if (!table) {
+            console.error('Table element not found.');
+            return;
+        }
+    
+        var tableRows = table.querySelectorAll('tr');
+        if (tableRows.length < 2) {
+            console.error('Table has insufficient rows.');
+            return;
+        }
+    
+        var doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'pt',
+            format: [1200, 800]
+        }); 
+    
+        var headers = [];
+        var headerCells = tableRows[0].querySelectorAll('th');
+        for (var i = 0; i < headerCells.length; i++) {
+            headers.push(headerCells[i].textContent.trim());
+        }
+    
+        var data = [];
+        for (var i = 1; i < tableRows.length; i++) {
+            var rowData = [];
+            var cells = tableRows[i].querySelectorAll('td');
+            var rowMatch = false;
+            for (var j = 0; j < cells.length; j++) {
+                var cellData = cells[j].textContent.trim();
+                if (cellData.toUpperCase().includes(filter)) {
+                    rowMatch = true;
+                }
+                rowData.push(cellData);
+            }
+            if (rowMatch || filter === '') {
+                data.push(rowData);
+            }
+        }
+    
+        if (data.length < 1) {
+            console.error('No matching data found for the provided search.');
+            return;
+        }
+    
+        doc.autoTable({
+            head: [headers],
+            body: data,
+            startY: 50,
+            theme: 'grid',
+            styles: {
+                cellPadding: 5,
+                fontSize: 10,
+                valign: 'middle',
+                overflow: 'linebreak'
+            },
+            columnStyles: {
+                0: {cellWidth: 100},
+                1: {cellWidth: 100},
+            }
+        });
+    
+        doc.save('My_copyrights_data.pdf');
+    }
+</script>
+{% endblock main_content %}

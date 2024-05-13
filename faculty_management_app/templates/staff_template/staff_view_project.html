@@ -1,0 +1,71 @@
+<!-- staff_template/view_project.html -->
+
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    View Project
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<style>
+    .card-header {
+        background-color: grey !important; 
+      }
+    
+      .content {
+        animation: fadeIn 1.0s ease-in-out; /* Adjust timing and easing as needed */
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+</style>
+<section class="content">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="small-box bg-blue">
+                <div class="inner">
+                    <h3>{{ consultancy_project_count }}</h3>
+                    <p>Consultancy Projects</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-briefcase"></i> <!-- Assuming this icon represents consultancy projects -->
+                </div>
+                <a href="{% url 'staff_view_consultancy_project' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>{{ product_development_count }}</h3>
+                    <p>Product Development</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-cogs"></i> <!-- Assuming this icon represents product development -->
+                </div>
+                <a href="{% url 'staff_view_product_development' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-orange">
+                <div class="inner">
+                    <h3>{{ project_proposals_count }}</h3>
+                    <p>Project Proposal</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-file-alt"></i> <!-- Assuming this icon represents project proposals -->
+                </div>
+                <a href="{% url 'staff_view_project_proposal' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock main_content %}

@@ -1,0 +1,268 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>HOD Login</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static "fontawesome-free/css/all.min.css" %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="{% static "icheck-bootstrap/icheck-bootstrap.min.css" %}">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="{% static "jqvmap/jqvmap.min.css" %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css'  %}">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static "overlayScrollbars/css/OverlayScrollbars.min.css" %}">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="{% static "daterangepicker/daterangepicker.css" %}">
+  <!-- summernote -->
+  <link rel="stylesheet" href="{% static "summernote/summernote-bs4.css" %}">
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{% static 'dist/img/peclogo.ico' %}">
+    {% comment %} For Custom CSS {% endcomment %}
+
+    {% block custom_css %}
+    <style>
+      .main-sidebar {
+        background-color: rgba(0, 0, 0, 0.75) !important;
+      }
+    /* Custom CSS for making sidebar transparent */
+  .user-panel .info a:hover {
+    color: #4dd0e1; /* Light blue hover effect; adjust as per your color scheme */
+    text-decoration: none; /* Optional: remove underline on hover */
+  }
+  .content-wrapper {
+    background: linear-gradient(to bottom right, #a4c9ff, #eef2f7); /* Light gray gradient */
+    color: #333; /* Dark text for readability */
+  }
+  .main-header, .main-footer {
+    background-color: rgba(238, 242, 247, 0.95); /* Semi-transparent light end of gradient */
+  }
+  .card, .info-box, .callout, .alert {
+      background-color: rgba(255, 255, 255, 0.5) !important; /* Adjust transparency as needed */
+      color: #333 !important; /* Ensuring text is readable */
+  }
+  .Btn {
+    --black: #000000;
+    --ch-black: #141414;
+    --eer-black: #1b1b1b;
+    --night-rider: #2e2e2e;
+    --white: #ffffff;
+    --af-white: #f3f3f3;
+    --ch-white: #e1e1e1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 40px;
+    height: 35px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition-duration: .3s;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+    background-color: var(--af-white);
+  }
+  
+  /* plus sign */
+  .sign {
+    width: 100%;
+    transition-duration: .3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .sign svg {
+    width: 17px;
+  }
+  
+  .sign svg path {
+    fill: var(--night-rider);
+  }
+  /* text */
+  .text {
+    position: absolute;
+    right: 0%;
+    width: 0%;
+    opacity: 0;
+    color: var(--night-rider);
+    font-size: 1.2em;
+    font-weight: 600;
+    transition-duration: .3s;
+  }
+  /* hover effect on button width */
+  .Btn:hover {
+    width: 125px;
+    border-radius: 5px;
+    transition-duration: .3s;
+  }
+  
+  .Btn:hover .sign {
+    width: 30%;
+    transition-duration: .3s;
+    padding-left: 20px;
+  }
+  /* hover effect button's text */
+  .Btn:hover .text {
+    opacity: 1;
+    width: 70%;
+    transition-duration: .3s;
+    padding-right: 10px;
+  }
+  /* button click effect*/
+  .Btn:active {
+    transform: translate(2px ,2px);
+  }
+</style>
+    {% endblock custom_css %}
+    
+
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+  <div class="wrapper">
+
+  <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+      <!-- Left navbar links -->
+      
+
+      <h4 style="margin-left: 10px; margin-top: 5px;">Faculty Publications Management System | HOD Login</h4>
+
+      <ul class="navbar-nav ml-auto">
+        
+        <!-- Notifications Dropdown Menu -->
+        <button class="Btn" onclick="showLogoutModal()">
+          <div class="sign"><svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg></div>
+          <div class="text">Logout</div>
+        </button>
+        
+        
+        
+      </ul>
+
+    </nav>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    {% include 'hod_template/sidebar_template.html' with user=user id=id %}
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+
+    <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0 text-dark">
+                {% block page_title %}
+                {% endblock page_title %}
+              </h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+            
+            </div>
+            <!-- /.col -->
+          </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+      </div>
+      <!-- /.content-header -->
+
+      <!-- Main content -->
+      {% block main_content %}
+      {% endblock main_content %}
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    {% include 'hod_template/footer.html' %}
+
+    
+  </div>
+  <!-- ./wrapper -->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="logoutModalLabel">Confirmation</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to logout?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmLogoutButton">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- jQuery -->
+<script src="{% static "jquery/jquery.min.js"  %}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="{% static "jquery-ui/jquery-ui.min.js"  %}"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="{% static "bootstrap/js/bootstrap.bundle.min.js"  %}"></script>
+<!-- ChartJS -->
+<script src="{% static "chart.js/Chart.min.js"  %}"></script>
+<!-- Sparkline -->
+<script src="{% static "sparklines/sparkline.js"  %}"></script>
+<!-- JQVMap -->
+<script src="{% static "jqvmap/jquery.vmap.min.js"  %}"></script>
+<script src="{% static "jqvmap/maps/jquery.vmap.usa.js"  %}"></script>
+<!-- jQuery Knob Chart -->
+<script src="{% static "jquery-knob/jquery.knob.min.js"  %}"></script>
+<!-- daterangepicker -->
+<script src="{% static "moment/moment.min.js"  %}"></script>
+<script src="{% static "daterangepicker/daterangepicker.js"  %}"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{% static "tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"  %}"></script>
+<!-- Summernote -->
+<script src="{% static "summernote/summernote-bs4.min.js"  %}"></script>
+<!-- overlayScrollbars -->
+<script src="{% static "overlayScrollbars/js/jquery.overlayScrollbars.min.js"  %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static 'dist/js/adminlte.js'  %}"></script>
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script src="{% static 'dist/js/pages/dashboard.js'  %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'dist/js/demo.js'  %}"></script>
+
+<script>
+  $(document).ready(function() {
+    $('.sidebar-mini').addClass('sidebar-collapse');
+  });
+  function showLogoutModal() {
+    $('#logoutModal').modal('show');
+  }
+
+  document.getElementById('confirmLogoutButton').addEventListener('click', function() {
+    // Perform logout action
+    window.location.href = "{% url 'logout_user' %}";
+  });
+</script>
+{% comment %} For Custom JS {% endcomment %}
+{% block custom_js %}
+{% endblock custom_js %}
+
+</body>
+</html>

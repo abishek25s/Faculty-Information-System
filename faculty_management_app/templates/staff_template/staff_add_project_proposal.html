@@ -1,0 +1,336 @@
+<!-- Include Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Include Font Awesome for calendar icon -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- Include Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    Add Project Proposal
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<style>
+    .button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #000080;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 16px; /* Reduced font size */
+        padding: 10px 20px; /* Reduced padding */
+        width: auto; /* Adjusted width */
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .button span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .button span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+
+    .button:hover span {
+        padding-right: 25px;
+    }
+
+    .button:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+    .scrollable-dropdown {
+        position: absolute;
+        width: calc(84% - 2px);
+        max-height: 150px;
+        overflow-y: auto;
+        display: none;
+        border: 1px solid #ced4da;
+        border-top: none;
+        z-index: 999;
+    }
+    
+    .scrollable-dropdown button {
+        cursor: pointer;
+    }
+    
+</style>
+
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    {% comment %} Display Messages {% endcomment %}
+                    {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'staff_add_project_proposal_save' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+
+                            <div class="row">
+                            <!-- New Set of Input Fields -->
+                            <div class="form-group col-md-8">
+                                <label>Project Title</label>
+                                <input type="text" id="title" name="title" class="form-control"  />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Duration</label>
+                                <div class="input-group">
+                                    <input type="number" id="duration_numeric" name="duration_numeric" class="form-control"  />
+                                    <select name="duration_unit" id="duration_unit" class="form-control">
+                                        <option value="day">Day(s)</option>
+                                        <option value="week">Week(s)</option>
+                                        <option value="month">Month(s)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group col-md-3 position-relative">
+                                <label for="academic_year">Academic Year</label>
+                                <div class="input-group">
+                                    <input type="text" id="academic_year" name="academic_year" class="form-control" placeholder="YYYY-YYYY" >
+                                   
+                                </div>
+                                <div id="academic_year_dropdown" class="scrollable-dropdown">
+                                    <!-- Suggestions will be dynamically added here -->
+                                </div>
+                                <div class="invalid-feedback">
+                                    Academic year must be in the format YYYY-YYYY and start after 1850.
+                                </div>
+                            </div>
+                            
+                            <div class="form-group col-md-3">
+                                <label>Amount</label>
+                                <input type="number" name="amount" class="form-control" />
+                            </div>
+                            
+                            <div class="form-group col-md-3">
+                                <label>Funding Agency</label>
+                                <select name="funding_agency" id="funding_agency" class="form-control" >
+                                    <option value="" disabled selected>Select Status...</option>
+                                    <option value="Government">Government</option>
+                                    <option value="Non-Government">Non-Government</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label>Status</label>
+                                <select name="status" id="status" class="form-control" >
+                                    <option value="" disabled selected>Select Status...</option>
+                                    <option value="Ongoing">Ongoing</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <!-- Card Footer and Submit Button -->
+                    <div class="text-center">
+                        <button id="add_publication_button" class="button" style="vertical-align:middle"><span>Add Project </span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var academicYearInput = document.getElementById('academic_year');
+        var currentYear = new Date().getFullYear();
+
+        academicYearInput.addEventListener('input', function () {
+            var inputYear = parseInt(academicYearInput.value);
+            if (!isNaN(inputYear) && inputYear > currentYear) {
+                // Clear the input value if the entered year is in the future
+                academicYearInput.value = '';
+                academicYearInput.classList.add('is-invalid');
+            } else {
+                academicYearInput.classList.remove('is-invalid');
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Form submission validation
+        document.querySelector('form').addEventListener('submit', function (event) {
+            var requiredFields = ['title', 'duration_numeric', 'duration_unit', 'academic_year', 'funding_agency', 'status', 'amount'];
+            var filled = true;
+            requiredFields.forEach(function(field) {
+                var input = document.querySelector('[name="' + field + '"]');
+                if (!input.value.trim()) {
+                    filled = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+
+                // Custom validation for amount field
+                if (field === 'amount') {
+                    var amount = parseFloat(input.value);
+                    if (isNaN(amount) || amount <= 0) {
+                        filled = false;
+                        input.classList.add('is-invalid');
+                    } else {
+                        input.classList.remove('is-invalid');
+                    }
+                }
+
+                // Custom validation for academic year format and range
+                if (field === 'academic_year') {
+                    var academicYearPattern = /^\d{4}-\d{4}$/;
+                    if (!input.value.trim() || !academicYearPattern.test(input.value)) {
+                        filled = false;
+                        input.classList.add('is-invalid');
+                    } else {
+                        var startYear = parseInt(input.value.substring(0, 4));
+                        if (startYear < 1850) {
+                            filled = false;
+                            input.classList.add('is-invalid');
+                        } else {
+                            input.classList.remove('is-invalid');
+                        }
+                    }
+                }
+            });
+
+            // Custom validation for academic year
+            var academicYearInput = document.getElementById('academic_year');
+            var inputYear = parseInt(academicYearInput.value);
+            var currentYear = new Date().getFullYear();
+            if (isNaN(inputYear) || inputYear > currentYear) {
+                filled = false;
+                academicYearInput.classList.add('is-invalid');
+            } else {
+                academicYearInput.classList.remove('is-invalid');
+            }
+
+            if (!filled) {
+                event.preventDefault(); 
+            }
+        });
+    });
+
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        var academicYearInput = document.getElementById('academic_year');
+        var academicYearDropdown = document.getElementById('academic_year_dropdown');
+        var academicYearSuggestions = document.getElementById('academic_year_suggestions');
+
+        academicYearInput.addEventListener('input', function () {
+            var inputYear = parseInt(academicYearInput.value);
+            if (!isNaN(inputYear)) {
+                var currentYear = new Date().getFullYear();
+                var previousYear = inputYear - 1;
+                var nextYear = inputYear + 1;
+                var suggestions = [previousYear + "-" + inputYear, inputYear + "-" + nextYear];
+                academicYearDropdown.innerHTML = ''; // Clear previous suggestions
+                suggestions.forEach(function(year) {
+                    var option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    academicYearDropdown.appendChild(option);
+                });
+                academicYearSuggestions.style.display = 'block';
+            } else {
+                academicYearSuggestions.style.display = 'none';
+            }
+        });
+
+        academicYearDropdown.addEventListener('change', function () {
+            academicYearInput.value = academicYearDropdown.value;
+            academicYearSuggestions.style.display = 'none';
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        var academicYearInput = document.getElementById('academic_year');
+        var academicYearDropdown = document.getElementById('academic_year_dropdown');
+        var academicYearDropdownToggle = document.getElementById('academic_year_dropdown_toggle');
+
+        academicYearInput.addEventListener('input', function () {
+            var inputYear = parseInt(academicYearInput.value);
+            if (!isNaN(inputYear)) {
+                var currentYear = new Date().getFullYear();
+                var previousYear = inputYear - 1;
+                var nextYear = inputYear + 1;
+                var suggestions = [previousYear + "-" + inputYear, inputYear + "-" + nextYear];
+                academicYearDropdown.innerHTML = ''; // Clear previous suggestions
+                suggestions.forEach(function(year) {
+                    var option = document.createElement('div');
+                    option.className = 'dropdown-item';
+                    option.textContent = year;
+                    option.addEventListener('click', function () {
+                        academicYearInput.value = year;
+                        academicYearDropdown.style.display = 'none';
+                    });
+                    academicYearDropdown.appendChild(option);
+                });
+                academicYearDropdown.style.display = 'block';
+            } else {
+                academicYearDropdown.style.display = 'none';
+            }
+        });
+
+        academicYearDropdownToggle.addEventListener('click', function () {
+            if (academicYearDropdown.style.display === 'none') {
+                academicYearDropdown.style.display = 'block';
+            } else {
+                academicYearDropdown.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock custom_js %}

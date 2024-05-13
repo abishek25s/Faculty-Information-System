@@ -1,0 +1,118 @@
+<!-- staff_template/view_project.html -->
+
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    View Project
+{% endblock page_title %}
+
+{% block main_content %}
+<style>
+    .card-header {
+        background-color: grey !important; 
+      }
+    
+      .content {
+        animation: fadeIn 1.0s ease-in-out; /* Adjust timing and easing as needed */
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+</style>
+{% load static %}
+<section class="content">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="small-box bg-blue">
+                <div class="inner">
+                    <h3>{{ consultancy_project_count }}</h3>
+                    <p>Consultancy Projects</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-briefcase"></i> <!-- Assuming this icon represents consultancy projects -->
+                </div>
+                <a href="{% url 'view_consultancy_project' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>{{ product_development_count }}</h3>
+                    <p>Product Development</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-cogs"></i> <!-- Assuming this icon represents product development -->
+                </div>
+                <a href="{% url 'view_product_development' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-orange">
+                <div class="inner">
+                    <h3>{{ project_proposals_count }}</h3>
+                    <p>Project Proposal</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-file-alt"></i> <!-- Assuming this icon represents project proposals -->
+                </div>
+                <a href="{% url 'view_project_proposal' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <!-- Bar Chart Section -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Projects per Academic Year</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="barChart" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>       
+</section><br>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    setTimeout(function(){ 
+        barChartCanvas = $('#barChart').get(0).getContext('2d');
+        var academic_years = {{ academic_years|safe }};
+        var project_count = {{ project_count|safe }};
+        var barChartData = {
+            labels: academic_years,
+            datasets: [
+                {
+                    label: 'Projects',
+                    backgroundColor: 'rgba(210, 105, 30, 0.6)',
+                    borderColor: 'rgba(60,141,188,0.8)',
+                    pointRadius: false,
+                    pointColor: '#3b8bba',
+                    pointStrokeColor: 'rgba(60,141,188,1)',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(60,141,188,1)',
+                    data: project_count
+                },
+            ]
+        };
+        var barChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            datasetFill: false
+        };
+        var barChart = new Chart(barChartCanvas, {
+            type: 'bar',
+            data: barChartData,
+            options: barChartOptions
+        });},500);
+</script>
+{% endblock main_content %}

@@ -1,0 +1,288 @@
+<!-- Include Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Include Font Awesome for calendar icon -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- Include Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    Add Organized Academic Contributions
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<style>
+    .button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #000080;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 16px; /* Reduced font size */
+        padding: 10px 20px; /* Reduced padding */
+        width: auto; /* Adjusted width */
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .button span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .button span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+
+    .button:hover span {
+        padding-right: 25px;
+    }
+
+    .button:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+    .button-container {
+        text-align: center;
+    }
+    
+</style>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                
+                    <!-- /.card-header -->
+
+                    {% comment %} Display Messages {% endcomment %}
+                    {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'staff_add_organized_AC_save' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+                        <div class="row">
+
+                            <div class="form-group col-md-4">
+                                <label>Event Mode</label>
+                                <select name="event" class="form-control">
+                                    <option value="" disabled selected>Select an option...</option>
+                                    <option value="Workshops">Workshops</option>
+                                    <option value="FDP">FDP</option>
+                                    <option value="Winter Training">Winter Training</option>
+                                    <option value="Value Added Course">Value Added Course</option>
+                                    <option value="Short term Course">Short term Course</option>
+                                    <option value="Webinars">Webinars</option>
+                                    <option value="Guest Lecture / Seminars">Guest Lecture / Seminars</option>
+                                </select>
+                            </div>
+                                              
+                            
+                            <div class="form-group col-md-4">
+                                <label>Name of the Event</label>
+                                <input type="text" name="title" class="form-control" />
+                            </div>
+                            
+                            <div class="form-group col-md-4">
+                                <label>Mode of Event</label>
+                                <select name="event_mode" class="form-control">
+                                    <option value="" disabled selected>Select an option...</option>
+                                    <option value="Online">Online</option>
+                                    <option value="Offline">Offline</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group col-md-4">
+                                <label>Start Date</label>
+                                <div class="input-group">
+                                    <input type="text" id="start_date" name="start_date" class="form-control" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="calendar-icon-patent">
+                                            <i class="fas fa-calendar"></i> <!-- Font Awesome calendar icon -->
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group col-md-4">
+                                <label>End Date</label>
+                                <div class="input-group">
+                                    <input type="text" id="end_date" name="end_date" class="form-control" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="calendar-icon-patent">
+                                            <i class="fas fa-calendar"></i> <!-- Font Awesome calendar icon -->
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group col-md-4">
+                                <label>Resource Person</label>
+                                <input type="text" name="resource_person" class="form-control" />
+                            </div>
+                            
+                            <div class="form-group col-md-4">
+                                <label>Professional Bodies</label>
+                                <input type="text" name="club_name" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Target Audience</label>
+                                <select name="target_audience" class="form-control">
+                                    <option value="" disabled selected>Select an option...</option>
+                                    <option value="Faculty">Faculty</option>
+                                    <option value="Student">Student</option>
+                                </select>
+                            </div>    
+
+                            <div class="form-group col-md-4">
+                                <label>Count of Audience</label>
+                                <input type="text" name="count" class="form-control" />
+                            </div>
+                            
+                            <div class="form-group col-md-4">
+                                <label>Upload Proof</label>
+                                <input type="file" name="report_proof" class="form-control-file" accept=".pdf" />
+                                <div id="report_proof-error" class="invalid-feedback"></div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+
+                    <div class="button-container">
+                        <button id="add_publication_button" class="button" style="vertical-align:middle"><span>Add Contribution </span></button>
+                    </div>
+                    
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var startDateInput = document.getElementById('start_date');
+        var endDateInput = document.getElementById('end_date');
+
+        // Initialize Flatpickr on start_date input field
+        var startDatePicker = flatpickr(startDateInput, {
+            dateFormat: "Y-m-d",
+            disableMobile: true,
+            onChange: function(selectedDates, dateStr, instance) {
+                // Set minDate and default to selected start date
+                endDatePicker.set('minDate', dateStr);
+                endDatePicker.setDate(dateStr);
+            }
+        });
+
+        // Initialize Flatpickr on end_date input field
+        var endDatePicker = flatpickr(endDateInput, {
+            dateFormat: "Y-m-d",
+            disableMobile: true,
+            // Set minDate to the default date
+            minDate: startDateInput.value,
+            // Set maxDate to today
+            maxDate: "today",
+        });
+
+        // Hide the dates before the selected start date in the end date calendar
+        startDateInput.addEventListener('change', function() {
+            endDatePicker.set('minDate', startDateInput.value);
+        });
+    });
+
+    // Form submission validation
+    document.querySelector('form').addEventListener('submit', function (event) {
+        var requiredFields = ['event', 'title', 'event_mode', 'start_date', 'end_date', 'resource_person', 'club_name', 'target_audience', 'count'];
+        var filled = true;
+        requiredFields.forEach(function(field) {
+            var input = document.querySelector('[name="' + field + '"]');
+            if (!input.value.trim()) {
+                filled = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        // Validate Count of Audience field
+        var countInput = document.querySelector('[name="count"]');
+        if (!/^\d+$/.test(countInput.value.trim())) {
+            event.preventDefault(); 
+            countInput.classList.add('is-invalid'); 
+            countInput.value = ''; 
+            countInput.placeholder = 'Please enter a valid number'; 
+        } else {
+            countInput.classList.remove('is-invalid');
+        }
+
+        // Validate Upload Proof field
+        var proofInput = document.querySelector('[name="report_proof"]');
+        var proofErrorElement = document.getElementById('report_proof-error');
+        if (!proofInput.files.length) { 
+            event.preventDefault(); 
+            proofInput.classList.add('is-invalid'); 
+            proofErrorElement.innerText = 'Please upload the proof.'; 
+            proofErrorElement.style.display = 'block'; 
+        } else {
+            proofInput.classList.remove('is-invalid'); 
+            proofErrorElement.innerText = ''; 
+            proofErrorElement.style.display = 'none'; 
+        }
+
+        if (!filled) {
+            event.preventDefault(); 
+        }
+    });
+</script>
+
+{% endblock custom_js %}
+
+

@@ -1,0 +1,103 @@
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    View Publications
+{% endblock page_title %}
+
+{% block main_content %}
+{% load static %}
+<style>
+    .card-header {
+        background-color: grey !important; 
+      }
+    
+      .content {
+        animation: fadeIn 1.0s ease-in-out; /* Adjust timing and easing as needed */
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+</style>
+<section class="content">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="small-box bg-blue">
+                <div class="inner">
+                    <h3>{{ journal_count }}</h3>
+                    <p>Journal</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <a href="{% url 'staff_view_journal' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>{{ conference_count }}</h3>
+                    <p>Conference</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <a href="{% url 'staff_view_conference' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-orange">
+                <div class="inner">
+                    <h3>{{ book_count }}</h3>
+                    <p>Book</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <a href="{% url 'staff_view_books' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-red">
+                <div class="inner">
+                    <h3>{{ book_chapter_count }}</h3>
+                    <p>Book Chapter</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <a href="{% url 'staff_view_book_chapters' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-purple">
+                <div class="inner">
+                    <h3>{{ copyright_count }}</h3>
+                    <p>Copyright</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-copyright"></i>
+                </div>
+                <a href="{% url 'staff_view_copyrights' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3>{{ patent_count }}</h3>
+                    <p>Patent</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <a href="{% url 'staff_view_patent' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

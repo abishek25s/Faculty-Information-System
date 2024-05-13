@@ -1,0 +1,268 @@
+<!-- Include Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Include Font Awesome for calendar icon -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- Include Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    Add Journal
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<style>
+    .button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #000080;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 16px; /* Reduced font size */
+        padding: 10px 20px; /* Reduced padding */
+        width: auto; /* Adjusted width */
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .button span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .button span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+
+    .button:hover span {
+        padding-right: 25px;
+    }
+
+    .button:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+</style>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    
+                    <!-- /.card-header -->
+
+                    {% comment %} Display Messages {% endcomment %}
+                    {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'staff_add_journal_save' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+                        <div class="row">
+
+                            <div class="form-group col-md-12">
+                                <label>Title of the Paper</label>
+                                <input type="text" name="title" class="form-control" />
+                            </div>
+
+
+                            <div class="form-group col-md-4">
+                                <label>Author</label>
+                                <input type="text" name="author" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label for="department">Department</label>
+                                <input type="text" name="department" class="form-control" value="Information Technology" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Affiliating Institute at the Time of Publication</label>
+                                <input type="text" name="affiliating_institute" class="form-control"
+                                    value="Panimalar Engineering College" />
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Journal Name</label>
+                                <input type="text" name="journal_name" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Journal Index</label>
+                                <div>
+                                    <input type="checkbox" id="scopus" name="journal_index[]" value="Scopus">
+                                    <label for="scopus">Scopus</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="wos" name="journal_index[]" value="WoS">
+                                    <label for="wos">WoS</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="ugc_care" name="journal_index[]" value="SCIE">
+                                    <label for="SCIE">SCIE</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="others" name="journal_index[]" value="Others">
+                                    <label for="others">Others (Please Specify Below) </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="others_textfield" style="display: none;">
+                                <label>Other Journal Index</label>
+                                <input type="text" name="other_journal_index" class="form-control" />
+                            </div>
+                        
+                            
+                            <div class="form-group col-md-4">
+                                <label>Month & Year of Publication</label>
+                                <div class="input-group">
+                                    <input type="month" id="year_of_publication" name="year_of_publication" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>ISSN Number</label>
+                                <input type="text" name="isbn_issn_number" id="isbn_issn_number" class="form-control" inputmode="numeric" pattern="[0-9]*" />
+                                <div class="invalid-feedback">
+                                    Please enter a valid ISSN number with 8 or 13 digits.
+                                </div>
+                            </div>
+                            
+                            <div class="form-group col-md-4">
+                                <label>DOI Number</label>
+                                <input type="text" name="doi_number" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Scopus ID</label>
+                                <input type="text" name="scopus_id" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Link to the Journal Website</label>
+                                <input type="text" name="journal_website" class="form-control" />
+                            </div>
+                    <div class="form-group col-md-4">
+                        <label>Journal PDF </label>
+                        <input type="file" name="journal_pdf" class="form-control-file" accept=".pdf" />
+                    </div>
+                </div>
+                        <div class="text-center">
+                            <button id="add_publication_button" class="button" style="vertical-align:middle"><span>Add Journal </span></button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    var currentDate = new Date();
+    var currentYear = currentDate.getFullYear();
+    var currentMonth = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Adding 1 because JavaScript months are zero-based
+    document.getElementById('year_of_publication').setAttribute('max', currentYear + '-' + currentMonth);
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        
+    
+        // Function to check if ISBN/ISSN number is valid
+        function isValidIsbnIssn(isbnIssn) {
+            isbnIssn = isbnIssn.replace(/[^0-9]/g, '');
+            return isbnIssn.length === 8 || isbnIssn.length === 13;
+        }
+    
+        // ISBN/ISSN input field validation
+        var isbnInput = document.getElementById('isbn_issn_number');
+        isbnInput.addEventListener('input', function () {
+            if (!isValidIsbnIssn(this.value)) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    
+        // Form submission validation
+        document.querySelector('form').addEventListener('submit', function (event) {
+            var requiredFields = ['title', 'author', 'department', 'affiliating_institute', 'journal_name', 'isbn_issn_number', 'doi_number', 'scopus_id'];
+            var filled = true;
+            requiredFields.forEach(function(field) {
+                var input = document.querySelector('[name="' + field + '"]');
+                if (!input.value.trim()) {
+                    filled = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+    
+            if (!filled) {
+                event.preventDefault();
+                // Instead of alert, you can optionally display an error message below the form or any other desired action.
+            } else if (!isValidIsbnIssn(isbnInput.value)) {
+                event.preventDefault();
+                isbnInput.classList.add('is-invalid');
+            }
+        });
+    
+        // Other Journal Index text field visibility
+        var othersCheckbox = document.getElementById('others');
+        var othersTextField = document.getElementById('others_textfield');
+    
+        othersCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+                othersTextField.style.display = 'block';
+            } else {
+                othersTextField.style.display = 'none';
+            }
+        });
+    });
+
+
+</script>
+{% endblock custom_js %}

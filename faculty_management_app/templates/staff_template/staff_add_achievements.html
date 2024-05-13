@@ -1,0 +1,143 @@
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    Add Achievement
+{% endblock page_title %}
+
+{% block main_content %}
+{% load static %}
+<style>
+    .button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #000080;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 16px; /* Reduced font size */
+        padding: 10px 20px; /* Reduced padding */
+        width: auto; /* Adjusted width */
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .button span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .button span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+
+    .button:hover span {
+        padding-right: 25px;
+    }
+
+    .button:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+</style>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            {% if messages %}
+                                <div class="form-group">
+                                    <div class="col-12">
+                                        {% for message in messages %}
+                                            {% if message.tags == "error" %}
+                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                    {{ message }}
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                            {% elif message.tags == "success" %}
+                                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                    {{ message }}
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <form method="POST" action="{% url 'staff_add_achievement_save' %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="row">
+                                <div class="form-group col-md-12">
+                                    <label>Title</label>
+                                    <input type="text" name="title" class="form-control" >
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <label>Description</label>
+                                    <textarea name="description" class="form-control" ></textarea>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Month & Year of Achievement</label>
+                                    <div class="input-group">
+                                        <input type="month" id="month_and_year" name="month_and_year" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Upload Proof </label>
+                                    <input type="file" name="cert_pdf" class="form-control-file" accept=".pdf" />
+                                </div>
+                            </div>
+                                <div class="text-center">
+                                    <button id="add_publication_button" class="button" style="vertical-align:middle"><span>Add Achievements </span></button>
+                                </div>                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock main_content %}
+{% block custom_js %}
+<script>
+    var currentDate = new Date();
+    var currentYear = currentDate.getFullYear();
+    var currentMonth = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Adding 1 because JavaScript months are zero-based
+    document.getElementById('month_and_year').setAttribute('max', currentYear + '-' + currentMonth);
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelector('form').addEventListener('submit', function (event) {
+        var requiredFields = ['title', 'description', 'month_and_year'];
+        var filled = true;
+
+        requiredFields.forEach(function(field) {
+            var input = document.querySelector('[name="' + field + '"]');
+            if (!input.value.trim()) {
+                filled = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        // Validate patent_number to contain only numbers
+        
+        if (!filled) {
+            event.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock custom_js %}

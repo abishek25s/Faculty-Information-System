@@ -1,0 +1,79 @@
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    Add Projects
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<style>
+    @keyframes slide-in-left {
+        0% {
+          opacity: 0;
+          transform: translateX(-100%);
+        }
+        100% {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes slide-in-right {
+        0% {
+          opacity: 0;
+          transform: translateX(100%);
+        }
+        100% {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }      
+      .card1 {
+        animation: fadeIn 1.0s ease-in-out; /* Adjust timing and easing as needed */
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 100;
+        }
+      }
+</style>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4" style="animation: slide-in-left 1.0s ease-out;">
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{% url 'staff_add_consultancy_projects' %}" class="btn btn-outline-primary btn-lg btn-block text-dark">Consultancy Project</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 card1">
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{% url 'staff_add_product_development' %}" class="btn btn-outline-primary btn-lg btn-block text-dark">Product Development</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4" style="animation: slide-in-right 1.0s ease-out;">
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{% url 'staff_add_project_proposal' %}" class="btn btn-outline-primary btn-lg btn-block text-dark">Project Proposal</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+
+</script>
+{% endblock custom_js %}

@@ -1,0 +1,383 @@
+<!-- hod_template/view_publications.html -->
+
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    View Publications
+{% endblock page_title %}
+{% block main_content %}
+<style>
+    .button {
+        position: relative;
+        overflow: hidden;
+        height: 3rem;
+        padding: 0 2rem;
+        border-radius: 1.5rem;
+        background: rgb(55, 205, 255);
+        background-size: 400%;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .button:hover::before {
+        transform: scaleX(1);
+    }
+
+    .button-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: scaleX(0);
+        transform-origin: 0 50%; 
+        width: 100%;
+        height: inherit;
+        border:none;
+        border-radius: inherit;
+        background: grey;
+        transition: all 0.475s;
+    }
+
+    /* Added CSS for active button state */
+    .button-active {
+        background: grey!important;
+    }
+
+    .card-header {
+        background-color: rgba(128, 128, 128, 0.683) !important; 
+    }
+
+    .content {
+        animation: fadeIn 1.0s ease-in-out; /* Adjust timing and easing as needed */
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+{% load static %}
+<section class="content">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="small-box bg-blue">
+                <div class="inner">
+                    <h3>{{ journal_count }}</h3>
+                    <p>Journal</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <a href="{% url 'view_journal' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>{{ conference_count }}</h3>
+                    <p>Conference</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <a href="{% url 'view_conference' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-orange">
+                <div class="inner">
+                    <h3>{{ book_count }}</h3>
+                    <p>Books</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <a href="{% url 'view_books' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-red">
+                <div class="inner">
+                    <h3>{{ book_chapter_count }}</h3>
+                    <p>Book Chapters</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <a href="{% url 'view_book_chapters' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-purple">
+                <div class="inner">
+                    <h3>{{ copyright_count }}</h3>
+                    <p>Copyrights</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-copyright"></i>
+                </div>
+                <a href="{% url 'view_copyrights' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3>{{ patent_count }}</h3>
+                    <p>Patents</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <a href="{% url 'view_patents' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <!-- Bar Chart Section -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Publications per Academic Year</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="barChart" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>       
+</section><br>
+<!-- <section>
+    <h1 >VIEW PUBLICATION STATS BY ACADEMIC YEAR</h1>
+</section> -->
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group" style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                {% for year in academic_years %}
+                    <button type="button" class="button" onclick="filterPublications('{{ year }}')">
+                        <span class="button-content">{{ year }}</span>
+                    </button>
+                {% endfor %}
+                <button type="button" class="button" onclick="filterPublications('All')">
+                    <span class="button-content">All</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Publication Details</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive p-0" id="publicationTable">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Faculty Name</th>
+                                    <th>Designation</th>
+                                    <th>No. of Publications</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- js does this job -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card card-danger">
+                    <div class="card-header">
+                        <h3 class="card-title">Faculty Publications Pie Chart</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function togglePopup() {
+        var popup = document.getElementById("popupContainer");
+        if (popup.style.display === "none" || popup.style.display === "") {
+            popup.style.display = "block";
+        } else {
+            popup.style.display = "none";
+        }
+    }
+    function closePopup() {
+        var popup = document.getElementById("popupContainer");
+        popup.style.display = "none";
+    }
+    function sortStaffByPublicationCount() {
+        var staffRows = document.querySelectorAll("#popupContent table tbody tr");
+        var staffArray = Array.from(staffRows);
+        staffArray.sort(function(a, b) {
+            var countA = parseInt(a.cells[2].textContent);
+            var countB = parseInt(b.cells[2].textContent);
+            return countB - countA;
+        });
+
+        // Clear current table
+        var tbody = document.querySelector("#popupContent table tbody");
+        tbody.innerHTML = "";
+
+        // Append sorted rows
+        staffArray.forEach(function(row) {
+            tbody.appendChild(row);
+        });
+    }
+
+    // Call the function to sort staff when the popup is opened
+    function togglePopup() {
+        var popup = document.getElementById("popupContainer");
+        if (popup.style.display === "none" || popup.style.display === "") {
+            popup.style.display = "block";
+            sortStaffByPublicationCount(); // Sort staff when popup is opened
+        } else {
+            popup.style.display = "none";
+        }
+    }
+    var barChartCanvas = $('#barChart').get(0).getContext('2d');
+    var academic_years = {{ academic_years|safe }};
+    var publication_counts = {{ publication_count|safe }};
+    var barChartData = {
+        labels: academic_years,
+        datasets: [
+            {
+                label: 'Publications',
+                backgroundColor: 'rgba(60,141,188,0.9)',
+                borderColor: 'rgba(60,141,188,0.8)',
+                pointRadius: false,
+                pointColor: '#3b8bba',
+                pointStrokeColor: 'rgba(60,141,188,1)',
+                pointHighlightFill: '#fff',
+                pointHighlightStroke: 'rgba(60,141,188,1)',
+                data: publication_counts
+            },
+        ]
+    };
+    var barChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false
+    };
+    var barChart = new Chart(barChartCanvas, {
+        type: 'bar',
+        data: barChartData,
+        options: barChartOptions
+    });
+</script>
+<script>
+    var pieChartColors = ['#FF5733', '#33FF57', '#3333FF', '#FF33EC', '#FFEC33', '#33ECFF'];
+
+    $(document).ready(function() {
+        // Call the function to fetch and display all publications data
+        filterPublications('All');
+    });
+
+    $(".btn-primary").on("click", function () {
+        var academicYear = $(this).text();
+        filterPublications(academicYear);
+    });
+    function filterPublications(year) {
+        $.ajax({
+            url: '{% url "fetch_publications" %}',
+            method: 'GET',
+            data: { 'year': year },
+            success: function (data) {
+                if (data.academic_year === year || year === 'All') {
+                    updatePublications(data.publications);
+                    updatePieChart(data.pie_chart_data); // Call updatePieChart here
+                }
+            },
+            error: function (error) {
+            }
+        });
+    }
+    function updatePublications(data) {
+        var tableBody = $('#publicationTable tbody');
+        tableBody.empty(); // Clear existing rows
+        var filteredData = data.filter(item => getTotalPublications(item.publications) > 0);
+        if (filteredData.length === 0) {
+            tableBody.append('<tr><td colspan="3">No publications available for the selected academic year.</td></tr>');
+        } else {
+            for (var i = 0; i < filteredData.length; i++) {
+                var rowHtml = '<tr>' +
+                    '<td>' + filteredData[i].staffName + '</td>' +
+                    '<td>' + filteredData[i].designation + '</td>' +
+                    '<td>' + getTotalPublications(filteredData[i].publications) + '</td>' +
+                    '</tr>';
+                tableBody.append(rowHtml);
+            }
+        }
+    }
+    function updatePieChart(data) {
+        var pieChartCanvas = document.getElementById('pieChart');
+        var staffNames = Object.keys(data);
+        var totalPublications = Object.values(data);
+        if (window.myPieChart !== undefined) {
+            window.myPieChart.destroy();
+        }
+        var ctx = pieChartCanvas.getContext('2d');
+        window.myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: staffNames, // Staff names as labels
+                datasets: [{
+                    data: totalPublications, // Total publications as data
+                    backgroundColor: pieChartColors,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            var label = data.labels[tooltipItem.index];
+                            var value = data.datasets[0].data[tooltipItem.index];
+                            return label + ': ' + value;
+                        }
+                    }
+                }
+                
+            }
+        });
+    }
+    function getTotalPublications(publications) {
+        var total = 0;
+        for (var key in publications) {
+            total += publications[key];
+        }
+        return total;
+    } 
+</script> 
+{% endblock main_content %}

@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% load static %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+{% block content %}
+<div class="hold-transition login-page" style="background: linear-gradient(135deg, #ffffff 0%, #6EC1E4 100%);">
+    <canvas id="canvas1"></canvas>
+
+    <div class="container-fluid custom-container"
+        style="padding: 60px 30px; max-width: 1200px; margin: 10px auto; box-shadow: 0 6px 20px 0 rgba(0,0,0,0.19); transition: 0.3s; border-radius: 25px; background: linear-gradient(135deg, #B9DFFF 0%, #E4F1FE 100%);">
+        <div class="row">
+            <div class="col-md-7 d-none d-md-flex justify-content-center align-items-center right-side"
+                style="color: #333;">
+                <div class="login-content text-center">
+                    <img src="{% static 'dist/img/panimalar faculty logo.png' %}" alt="Logo"
+                        style="width: 450px; height: auto; margin-bottom: 20px; margin-top: -100px;"><br><br>
+                    <div class="fac" style="font-family: 'Inter', sans-serif;">
+                        <span style="font-size: 24px; font-weight: 500; color: #333;">Department of</span>
+                        <span style="font-size: 24px; font-weight: 500; color: #333;"> Information Technology</span>
+                    </div>
+                    <h2 class="department-name"
+                        style="color:#004D99; font-family: 'Raleway', serif; font-size: 44px; font-weight: 700; margin-top: 20px; letter-spacing: 1px;">
+                        <i>Faculty Information System</i></h2><br>
+                    <h2 id="quote-text" class="quote"
+                        style="color: #333; font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 500; margin-top: 20px; letter-spacing: 1px;">
+                    </h2>
+                </div>
+            </div>
+            <div class="col-md-5 right-side" style="background-color: transparent;">
+                <div class="login-box">
+                    <style>
+                        .box-below {
+                            background-color: rgba(255, 255, 255, 0.2);
+                            /* Semi-transparent white background */
+                            padding: 20px;
+                            /* Adjust padding as needed */
+                            border-radius: 10px;
+                            /* Rounded corners */
+                            margin-top: 20px;
+                            /* Spacing between the texts and the box */
+                            display: flex;
+                            /* Set container as flex container */
+                            justify-content: center;
+                            /* Center items horizontally */
+                            align-items: center;
+                            /* Center items vertically */
+                            position: relative;
+                            /* Position for absolute positioning of the quote */
+                            font-style: italic;
+                        }
+
+                        .quote {
+                            font-size: 26px;
+                            /* Adjust the font size */
+                            font-weight: 600;
+                            /* Adjust the font weight */
+                            margin-top: 20px;
+                            /* Adjust the top margin */
+                            letter-spacing: 1px;
+                            /* Adjust the letter spacing */
+                            /* Text color */
+                        }
+
+                        .left-side {
+                            border-top-left-radius: 20px;
+                            /* Adjust border radius for left side */
+                            border-bottom-left-radius: 20px;
+                            padding: 20px 100px;
+                            /* Adjust padding */
+                            position: relative;
+                            /* Add relative positioning to left-side */
+                        }
+
+                        .login-content img {
+                            position: absolute;
+                            /* Position the content absolutely inside the left-side */
+                            top: 10px;
+                            /* Adjust top position */
+                            left: 85%;
+                            /* Center horizontally */
+                            transform: translateX(-50%);
+                            /* Adjust for centering */
+                        }
+
+                        .login-content {
+                            position: absolute;
+                            /* Position the content absolutely inside the left-side */
+                            top: 20px;
+                            /* Adjust top position */
+                            left: 50%;
+                            /* Center horizontally */
+                            transform: translateX(-50%);
+                            /* Adjust for centering */
+                        }
+
+                        .department-name {
+                            margin-top: 40px;
+                            font-size: 32px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+
+                        .fac {
+                            margin-top: 90px;
+                        }
+
+                        .login-logo a {
+                            width: 300px;
+                            font-weight: bold;
+                            font-family: 'Times New Roman', serif;
+                            font-size: 30px;
+                            background: linear-gradient(45deg, #00351f, #00351f);
+                            -webkit-background-clip: text;
+                            background-clip: text;
+                            color: transparent;
+                            text-align: center;
+                        }
+
+                        .left-side {
+                            border-top-left-radius: 20px;
+                            /* Adjust border radius for left side */
+                            border-bottom-left-radius: 20px;
+                            padding: 100px;
+                            /* Adjust padding for larger size */
+                        }
+
+                        .right-side {
+                            padding: 50px;
+                            /* Adjust padding for smaller size */
+                            border-top-right-radius: 20px;
+                            /* Adjust border radius for right side */
+                            border-bottom-right-radius: 20px;
+                        }
+
+                        @media (max-width: 767.98px) {
+
+                            /* Styles only for screens smaller than or equal to 767.98px (mobile view) */
+                            .right-side {
+                                border-top-left-radius: 20px;
+                                border-bottom-left-radius: 20px;
+                            }
+                        }
+
+                        #canvas1 {
+                            position: absolute;
+                            background-color: transparent;
+                            /* Set canvas background color to transparent */
+                            top: 0;
+                            left: 0;
+                            z-index: 0;
+                            /* ensure canvas is behind other content */
+                            width: 100%;
+                            /* Ensure canvas covers the entire body */
+                            height: 100%;
+                            /* Ensure canvas covers the entire body */
+                        }
+
+                        .button-52 {
+                            font-size: 16px;
+                            font-weight: 200;
+                            letter-spacing: 1px;
+                            padding: 10px 15px;
+                            /* Slightly reduced button size */
+                            outline: none;
+                            border: 1px solid #5770ff;
+                            cursor: pointer;
+                            position: relative;
+                            background-color: #5770ff;
+                            color: rgb(255, 255, 255);
+                            transition: background-color 0.2s ease, color 0.2s ease;
+                            overflow: hidden;
+                            border-radius: 15px
+                        }
+
+                        .button-52:hover {
+                            background-color: transparent;
+                            color: #000000;
+                        }
+
+                        @media (min-width: 768px) {
+                            .button-52 {
+                                padding: 10px 30px;
+                                /* Adjusted for different screen sizes */
+                            }
+                        }
+                    </style>
+                    <br><br><br>
+                    <div class="card"
+                        style="background-color: rgba(255, 255, 255, 0); border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.412);">
+                        <div class="card-body login-card-body" style="background-color: transparent;">
+                            <p class="login-box-msg"
+                                style="color: #0056b3; font-weight: 600; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; font-family: 'Montserrat', sans-serif;">
+                                Sign in</p>
+                            <form action="{% url 'doLogin' %}" method="POST">
+                                {% csrf_token %}
+                                <div class="input-group mb-3"
+                                    style="border-radius: 10px; border: 1px solid #000000; overflow: hidden;">
+                                    <input type="email" class="form-control" placeholder="Email" name="email"
+                                        style="border: none; background-color: #f8f9fa00; border-radius: 10px 0 0 10px;">
+                                    <div class="input-group-append" style="background-color: #ffffff00;">
+                                        <span class="input-group-text"
+                                            style="border: none; background-color: #ffffff00; border-radius: 0 10px 10px 0;">
+                                            <i class="fas fa-envelope" style="color: #797979;"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="input-group mb-3"
+                                    style="border-radius: 10px; border: 1px solid #000000; overflow: hidden;">
+                                    <input type="password" class="form-control" placeholder="Password" name="password"
+                                        style="border: none; background-color: #f8f9fa00; border-radius: 10px 0 0 10px;">
+                                    <div class="input-group-append" style="background-color: #ffffff00;">
+                                        <span class="input-group-text"
+                                            style="border: none; background-color: #ffffff00; border-radius: 0 10px 10px 0;">
+                                            <i class="fas fa-lock" style="color: #797979;"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <br>
+
+                                <div class="wrapper text-center">
+                                    <button type="submit" class="button-52" role="button">Sign In</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Display Messages -->
+                    {% if messages %}
+                    <div class="col-12">
+                        {% for message in messages %}
+                        {% if message.tags == "error" %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                            style="margin-top: 10px;">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <!-- /.col -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<script>
+    const quotes = [
+        "“The influence of a Great Teacher can never be erased.”",
+        "“Yesterday's Idea, Today's Mistake, Tomorrow's Wisdom.”",
+        "“One book, one pen, one child and one teacher can change the world.”",
+        "“The beautiful thing about learning is that no one can take it away from you.”",
+        "“We never know which lives we influence, or when or why.”",
+        "“Real learning comes about when the competitive spirit has ceased.”",
+        "“I have not failed. I've just found 10,000 ways that won't work.”",
+        "“The task of the modern educator is not to cut down jungles, but to irrigate deserts.”",
+    ];
+    function getRandomQuote() {
+        return quotes[Math.floor(Math.random() * quotes.length)];
+    }
+    function setQuote() {
+        const quoteText = document.getElementById('quote-text');
+        quoteText.textContent = getRandomQuote();
+    }
+    setQuote();
+</script>
+
+<script>
+    const canvas = document.getElementById('canvas1');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particlesArray = [];
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        init(); // Reinitialize to adjust the number of particles based on the new canvas size
+    });
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 1; // Slightly smaller particles
+            this.speedX = Math.random() * 1.5 - 0.75; // Reduced speed
+            this.speedY = Math.random() * 1.5 - 0.75;
+            // Random blue shades
+            if (Math.random() > 0.5) {
+                // Assign a random blue shade using template literals
+                this.color = `hsl(${200 + Math.random() * 50}, 100%, 50%)`;
+            } else {
+                // Assign white color
+                this.color = 'hsl(0, 0%, 100%)';
+            }
+        }
+
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+
+            // Particle boundary detection
+            if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
+            if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        }
+    }
+
+    function init() {
+        particlesArray = [];
+        let numberOfParticles = (canvas.height * canvas.width) / 9000;
+        for (let i = 0; i < numberOfParticles; i++) {
+            particlesArray.push(new Particle());
+        }
+    }
+
+    function handleParticles() {
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+            for (let j = i; j < particlesArray.length; j++) {
+                const dx = particlesArray[i].x - particlesArray[j].x;
+                const dy = particlesArray[i].y - particlesArray[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 100) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = particlesArray[i].color;
+                    ctx.lineWidth = 0.2; // Thin lines for a delicate effect
+                    ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                    ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        handleParticles();
+        requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+</script>
+
+{% endblock %}

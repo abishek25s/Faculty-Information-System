@@ -1,0 +1,172 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Update Profile
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<style>
+.card-body input[type="text"],
+.card-body input[type="password"] {
+    max-width: 500px;
+    margin-bottom: 10px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+.button {
+    display: inline-block;
+    border-radius: 4px;
+    background-color: #000080;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 16px; /* Reduced font size */
+    padding: 10px 20px; /* Reduced padding */
+    width: auto; /* Adjusted width */
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+
+.button:hover span {
+    padding-right: 25px;
+}
+
+.button:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+</style>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form id="updateProfileForm" role="form" method="POST" action="{% url 'admin_profile_update' %}">
+                        {% csrf_token %}
+
+                        {% comment %} Display Messages {% endcomment %}
+                        {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {% elif message.tags == "success" %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Username</label>
+                                    <input type="text" class="form-control" name="username" value="{{ user.username }}" disabled="disabled">
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Email</label>
+                                    <input type="text" class="form-control" name="email" value="{{ user.email }}" disabled="disabled">
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>First Name</label>
+                                    <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Last Name</label>
+                                    <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Fill only if you want to change Password.">
+                                    <div id="passwordValidationMessage" class="error-message"></div>
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Confirm Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirm_password" placeholder="Confirm Password">
+                                    <div id="confirmPasswordValidationMessage" class="error-message"></div>
+                                </div>
+                            </div>
+                            <!-- /.form-row -->
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="text-center">
+                            <button class="button" style="vertical-align:middle"><span>Update Profile </span></button>
+                        </div>
+                    </form>
+                    <!-- /.form -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<script>
+    document.getElementById('updateProfileForm').addEventListener('submit', function(event) {
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirmPassword').value;
+        var confirmPasswordValidationMessage = document.getElementById('confirmPasswordValidationMessage');
+    
+        if (password !== confirmPassword) {
+            confirmPasswordValidationMessage.innerText = "Passwords do not match.";
+            event.preventDefault();
+        } else {
+            confirmPasswordValidationMessage.innerText = "";
+        }
+    });
+</script>
+
+{% endblock main_content %}

@@ -1,0 +1,268 @@
+{% extends 'staff_template/base_template.html' %}
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% block main_content %}
+<style>
+    #chartCanvas {
+        max-width: 1000px;
+        margin: auto; /* Center the canvas if the container is wider */
+    }
+    .info-icon {
+        color: #17a2b8; /* Bootstrap's info color for consistency */
+        margin-right: 10px;
+    }
+    .profile-info {
+        margin-bottom: 20px;
+    }
+    .profile-info strong {
+        display: block;
+        color: #343a40; /* Dark gray */
+    }
+    .profile-info span {
+        font-size: 16px;
+    }
+    .contribution-icon {
+        margin-right: 10px;
+    }
+    .progress {
+        height: 20px; /* Makes the progress bars thinner */
+    }
+    .progress-bar {
+        background-color: #007bff; /* Primary color */
+    }
+    .contribution-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .contribution-item i {
+        margin-right: 15px;
+        color: #17a2b8; /* Bootstrap info color for consistency, or choose your own */
+    }
+
+    .contribution-item div {
+        font-size: 16px;
+    }
+    .chart-container {
+        width: 100%; /* Make the chart container take the full width of its parent */
+        max-width: 1000px; /* Optional: Set a max-width to prevent the chart from becoming too wide on large screens */
+        margin: auto; /* Center the container */
+        aspect-ratio: 16 / 9; /* Adjust the aspect ratio as needed */
+    }
+
+    #publicationChart {
+        width: 100% !important;
+        height: auto !important;
+    } 
+
+}
+.card1 {
+  box-sizing: border-box;
+  width: 190px;
+  height: 254px;
+  background: rgba(217, 217, 217, 0.58);
+  border: 1px solid white;
+  box-shadow: 12px 17px 51px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(6px);
+  border-radius: 17px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.5s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  font-weight: bolder;
+  color: black;
+}
+
+
+.container-fit-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px; /* Set the height of the container */
+    width: 150px; /* Set the width of the container */
+}
+
+.card1 {
+    max-width: 100%;
+    max-height: 100%;
+    border: 2.5px solid #000000; /* Optional: Add border for visualization */
+
+}
+.welcome-message {
+    font-size: 24px;
+    color: #333;
+    font-weight: bold;
+  }
+.title-content {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+</style>
+{% load static %}
+<section class="title-content">
+    <h1 class="welcome-message">Welcome {{ user.first_name }} {{ user.last_name }}!</h1>
+</section>
+<section class="content">
+            <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-primary card-outline">
+                    <div class="card-body">
+                        <h4>User Information</h4>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Name:</strong> <span>{{ staff.salutation }}.{{ staff.admin.first_name }} {{ staff.admin.last_name }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Email:</strong> <span>{{ staff.admin.email }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Phone:</strong> <span>{{ staff.phone }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Designation:</strong> <span>{{ staff.get_designation_display }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Address:</strong> <span>{{ staff.address }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Experience</strong> <span>{{ experience_years }} years & {{ experience_months }} months</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 profile-info">
+                                <div class="container-fit-content">
+                                    {% if staff.profile_picture %}
+                                        <img src="{{ staff.profile_picture.url }}" class="card1">
+                                    {% else %}
+                                        <img src="{% static 'dist/img/not_available.jpg' %}" class="card1">
+                                    {% endif %}
+                                </div>
+                            </div> 
+                        </div>
+                        <p><strong>Qualification and Experience: </strong><a href="{% url 'qualifications' staff_id=request.user.id %}">View Details</a></a></p>
+                        {% if staff.scopus_website %}
+                            <p><strong>Scopus Profile:</strong> <a href="{{ staff.scopus_website }}" target="_blank">View Profile</a></p>
+                        {% endif %}
+                        {% if staff.google_website %}
+                            <p><strong>Google Scholar Profile:</strong> <a href="{{ staff.google_website }}" target="_blank">View Profile</a></p>
+                        {% endif %}
+
+                        <hr>
+                    <h4>Contributions</h4><br>
+                    <div class="row">
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-book-open fa-2x"></i>
+                            <div>
+                                <strong>Journals Published:</strong>
+                                <span>{{ journal_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-users fa-2x"></i>
+                            <div>
+                                <strong>Conference Papers:</strong>
+                                <span>{{ conference_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-book fa-2x"></i>
+                            <div>
+                                <strong>Books Authored/Edited:</strong>
+                                <span>{{ book_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-file-alt fa-2x"></i>
+                            <div>
+                                <strong>Book Chapters:</strong>
+                                <span>{{ book_chapter_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-copy fa-2x"></i>
+                            <div>
+                                <strong>Copyrights:</strong>
+                                <span>{{ copyright_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-lightbulb fa-2x"></i>
+                            <div>
+                                <strong>Patents:</strong>
+                                <span>{{ patent_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-briefcase fa-2x"></i> 
+                            <div>
+                                <strong>Consultancy Projects:</strong>
+                                <span>{{ consultancy_project_count }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-cogs fa-2x"></i> 
+                            <div>
+                                <strong>Product Developed:</strong>
+                                <span>{{ product_developed_count }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-tasks fa-2x"></i> 
+                            <div>
+                                <strong>Projects Proposed:</strong>
+                                <span>{{ project_proposal_count }}</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'generate_resume_pdf' %}" class="btn btn-primary">Download Resume</a>
+
+                    </div>              
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+    <div class="chart-container">
+        <canvas id="publicationChart"></canvas>
+    </div>
+    
+
+    {% endblock main_content %}
+    {% block custom_js %}
+<script>
+    var ctx = document.getElementById('publicationChart').getContext('2d');
+    var academicYears = {{ academic_years|safe }};
+    var publicationCounts = {{ publication_counts|safe }};
+
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: academicYears,
+            datasets: [{
+                label: 'Publication Counts',
+                data: publicationCounts,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock custom_js %}

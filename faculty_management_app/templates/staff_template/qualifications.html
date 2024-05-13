@@ -1,0 +1,56 @@
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+Qualifications and Experiences
+{% endblock page_title %}
+
+{% block main_content %}
+<section class="content bg-light py-5">
+    <div class="container-fluid">
+        <!-- <h2 class="mb-4">Staff Qualifications and Experiences</h2> -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="m-0">{{ staff.salutation }} {{ staff.admin.first_name }} {{ staff.admin.last_name }} - {{ staff.designation }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h4>Qualifications:</h4>
+                    <ul class="list-group list-group-flush">
+                        {% for qualification in qualifications %}
+                        <li class="list-group-item"><i class="fas fa-graduation-cap mr-2"></i>{{ qualification.degree }} in {{ qualification.stream }}, Graduated in {{ qualification.year_of_graduation }}
+                            {% if qualification.certificate %}
+                                <a href="{{ qualification.certificate.url }}" target="_blank">View Certificate</a>
+                            {% else %}
+                                (Certifiate Not available)
+                            {% endif %}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No qualifications listed.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="mb-4">
+                    <h4>Experiences:</h4>
+                    <ul class="list-group list-group-flush">
+                        {% for experience in experience %}
+                        <li class="list-group-item"><i class="fas fa-briefcase mr-2"></i>{{ experience.organization }} as {{ experience.designation }}, from {{ experience.from_date|date:"Y-m-d" }} to {{ experience.to_date|date:"Y-m-d" }}</li>
+                        {% empty %}
+                        <li class="list-group-item">No experiences listed.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h4>Current Experience:</h4>
+                    <ul class="list-group list-group-flush">
+                        {% if current_experience %}
+                        <li class="list-group-item"><i class="fas fa-sync mr-2"></i>{{ current_experience.organization }} as {{ staff.designation }}, from {{ current_experience.from_date|date:"Y-m-d" }} to Present</li>
+                        {% else %}
+                        <li class="list-group-item">No current experience listed.</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

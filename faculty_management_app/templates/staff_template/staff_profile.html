@@ -1,0 +1,624 @@
+<!-- Update Profile Page -->
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    Update Profile
+{% endblock page_title %}
+
+{% block main_content %}
+    {% load static %}
+    <style>
+        .button {
+            display: inline-block;
+            border-radius: 4px;
+            background-color: #000080;
+            border: none;
+            color: #FFFFFF;
+            text-align: center;
+            font-size: 16px; /* Reduced font size */
+            padding: 10px 20px; /* Reduced padding */
+            width: auto; /* Adjusted width */
+            transition: all 0.5s;
+            cursor: pointer;
+            margin: 5px;
+        }
+    
+        .button span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+    
+        .button span:after {
+            content: '\00bb';
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            right: -20px;
+            transition: 0.5s;
+        }
+    
+        .button:hover span {
+            padding-right: 25px;
+        }
+    
+        .button:hover span:after {
+            opacity: 1;
+            right: 0;
+        }
+        .specialization-button.selected {
+            background-color: #007bff; /* Change to the color you want */
+            color: #fff; /* Change to the color you want */
+            /* Add any other styles you want to apply to the selected button */
+        }
+        .specialization-button {
+            margin-right: 10px; /* Adjust the value as needed */
+            margin-bottom: 10px; /* Optional: Add margin at the bottom */
+        }
+        
+        </style>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- General form elements -->
+                    <div class="card card-primary">
+                        <!-- Form start -->
+                        <form role="form" method="POST" action="{% url 'staff_profile_update' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            {% comment %} Display Messages {% endcomment %}
+                            {% if messages %}
+                                <div class="form-group">
+                                    <div class="col-12">
+                                        {% for message in messages %}
+                                            {% if message.tags == "error" %}
+                                                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                    {{ message }}
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                            {% elif message.tags == "success" %}
+                                                <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                    {{ message }}
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <!-- User Info -->
+                                <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label>Profile Picture</label><br>
+                                    <input type="file"  id="profile_picture" name="profile_picture">
+                                </div>
+                                <div class="form-group col-md-4">
+                                        <label>Staff ID</label>
+                                    <input type="text" class="form-control" name="staffid" value="{{ user.staffid }}" disabled="disabled">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Username </label>
+                                    <input type="text" class="form-control" name="username" value="{{ user.username }}" disabled="disabled">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Email</label>
+                                    <input type="text" class="form-control" name="email" value="{{ user.email }}" disabled="disabled">
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label for="salutation">Salutation</label>
+                                    <select name="salutation" id="salutation" class="form-control">
+                                        <option value="Dr" {% if staff.salutation == 'Dr' %}selected{% endif %}>Dr</option>
+                                        <option value="Mr" {% if staff.salutation == 'Mr' %}selected{% endif %}>Mr</option>
+                                        <option value="Ms" {% if staff.salutation == 'Ms' %}selected{% endif %}>Ms</option>
+                                        <option value="Mrs" {% if staff.salutation == 'Mrs' %}selected{% endif %}>Mrs</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-4">
+                                        <label>First Name</label>
+                                        <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                        <label>Last Name</label>
+                                        <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Aadhar Number</label>
+                                    <input type="text" class="form-control" id="aadhar_no" name="aadhar_no" value="{{ staff.aadhar_no }}">
+                                    <span id="aadhar-error" style="color: red;"></span>
+                                </div>
+
+                                <!-- PAN Number -->
+                                <div class="form-group col-md-4">
+                                    <label>PAN Number</label>
+                                    <input type="text" class="form-control" id="pan_no" name="pan_no" value="{{ staff.pan_no }}">
+                                    <span id="pan-error" style="color: red;"></span>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Phone</label>
+                                    <input type="text" class="form-control" id="phone" name="phone" value="{{ staff.phone }}">
+                                    <span id="phone-error" style="color: red;"></span>
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label for="designation">Designation</label>
+                                    <select name="designation" id="designation" class="form-control">
+                                        <option value="Professor" {% if staff.designation == 'Professor' %}selected{% endif %}>Professor</option>
+                                        <option value="Associate Professor" {% if staff.designation == 'Associate Professor' %}selected{% endif %}>Associate Professor</option>
+                                        <option value="Assistant Professor" {% if staff.designation == 'Assistant Professor' %}selected{% endif %}>Assistant Professor</option>
+                                    </select>
+                                </div>
+
+                                                                
+
+                                <!-- Aadhar Number -->
+                                
+
+                                <!-- Address -->
+                                <div class="form-group col-md-4">
+                                    <label>Address</label>
+                                    <textarea name="address" class="form-control" style="height: 38px;" rows="4">{{ staff.address }}</textarea>
+                                </div>
+
+                                <!-- Password -->
+                                <div class="form-group col-md-4">
+                                    <label>Password</label>
+                                    <input type="password" class="form-control" name="password" placeholder="Password" id="id_password">
+                                    <span class="password_error"></span>
+                                </div>
+
+
+                                
+                            </div>
+                                <!-- Qualifications -->
+                                <div class="form-group" id="qualification_fields">
+                                    <label>Qualifications</label>
+                                    <div class="qualification-set">
+                                        <div class="form-row">
+                                                <div class="form-group col-md-3">
+                                                    <label for="degreeInput">Degree</label>
+                                                    <input type="text" class="form-control" id="degreeInput" name="degree_type" placeholder="Enter Degree">
+                                                    <div id="suggestions" class="list-group"></div>
+                                                </div>
+                                            <div class="form-group col-md-3">
+                                                <label>Branch</label>
+                                                <input type="text" class="form-control" name="qualifications[]" placeholder="Enter Stream">
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label>Year of Graduation</label>
+                                                <input type="text" name="year_gra" class="form-control year_gra" inputmode="numeric" pattern="[0-9]*" />
+                                                <div class="invalid-feedback">Invalid</div>
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label>Upload Proof</label>
+                                                <input type="file" name="certificate" class="form-control-file" accept=".pdf" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success add-qualification">Add Qualification</button><br><br>
+                                {% if current_experience.staff.id %}
+                                    <div class="form-group" id="current_experience_field">
+                                        <label>Current Working</label>
+                                        <div class="current-experience-set">
+                                            <div class="row">
+                                                <div class="form-group col-md-4">
+                                                    <label>Organisation</label>
+                                                    <p class="form-control-static">{{ current_experience.organization }}</p>
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label>Designation</label>
+                                                    <p class="form-control-static">{{ staff.designation }}</p>
+                                                </div>
+                                                <div class="form-group col-md-2">
+                                                    <label>From</label>
+                                                    <p class="form-control-static">{{ current_experience.from_date | date:"Y-m-d" }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="form-group" id="current_experience_field">
+                                        <label>Current Working</label>
+                                        <div class="current-experience-set">
+                                            <div class="row">
+                                                <div class="form-group col-md-4">
+                                                    <label>Organisation</label>
+                                                    <input type="text" class="form-control" name="current_organization" value="Panimalar Engineering College" disabled="disabled">
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label>Designation</label>
+                                                    <input type="text" class="form-control" name="current_designation" value="{{staff.designation}}" disabled="disabled">
+                                                </div>
+                                                <div class="form-group col-md-2">
+                                                    <label>From</label>
+                                                    <input type="date" class="form-control" name="current_from_date" >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <!-- Experiences -->
+                                <div class="form-group" id="experience_fields">
+                                    <label>Previous Experiences</label>
+                                    <div class="experience-set">
+                                        <div class="row">
+                                            <div class="form-group col-md-4">
+                                                <label>Organisation</label>
+                                                <input type="text" class="form-control" name="company[]" placeholder="Organisation Name">
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <label>Designation</label>
+                                                <input type="text" class="form-control" name="designation[]" placeholder="Designation">
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <label>Workplace</label>
+                                                <select name="workplace[]" class="form-control">
+                                                    <option value="" disabled selected>Select an option</option>
+                                                    <option value="Industry">Industry</option>
+                                                    <option value="Institute">Institute</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <label>From</label>
+                                                <input type="date" class="form-control" name="from_date[]">
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <label>To</label>
+                                                <input type="date" class="form-control" name="to_date[]">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success add-experience">Add Experience</button>
+                                
+                                <br><br>
+                                <div class="form-group col-md-12">
+                                    <label>Specialized Area of Technology</label>
+                                    <div class="specialization-buttons">
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Machine Learning">Machine Learning</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Artificial Intelligence">Artificial Intelligence</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Data Science">Data Science</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Cybersecurity">Cybersecurity</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Cloud Computing">Cloud Computing</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Internet of Things (IoT)">Internet of Things (IoT)</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Natural Language Processing">Natural Language Processing</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Robotics">Robotics</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Blockchain Technology">Blockchain Technology</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Augmented Reality (AR) ">Augmented Reality (AR) </button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Virtual Reality (VR)">Virtual Reality (VR)</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Quantum Computing">Quantum Computing</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Network Security">Network Security</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Data Engineering">Data Engineering</button>
+                                        <button type="button" class="btn btn-outline-primary specialization-button" value="Embedded Systems">Embedded Systems</button>
+
+                                        <button type="button" class="btn btn-outline-primary specialization-button" data-toggle="modal" data-target="#othersModal">Others</button>
+                                    </div>
+                                    <input type="hidden" id="area_of_specialization" name="area_of_specialization">
+                                </div>
+                                
+                                <!-- Modal for "Others" button -->
+                                <div class="modal fade" id="othersModal" tabindex="-1" role="dialog" aria-labelledby="othersModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="othersModalLabel">Others</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="text" class="form-control" id="othersInput" placeholder="Enter other specialization">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary" id="addOthers">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                        
+                                    <div class="form-group col-md-6">
+                                        <label>Link to the Scopus Website</label>
+                                        <input type="text" name="scopus_website" class="form-control" value="{{ staff.scopus_website }}">
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label>Link to the Google Scholor Website</label>
+                                        <input type="text" name="google_website" class="form-control" value="{{ staff.google_website }}">
+                                    </div>
+
+                                </div>
+
+                                <div class="text-center">
+                                    <button class="button" style="vertical-align:middle"><span>Update Profile </span></button>
+                                </div>
+
+                            
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // List of degree suggestions
+        const degreeSuggestions = [
+            "B.E", "B.Tech", "B.Com","B.Sc.","B.A.","BBA","BCA","BS","M.E","M.Tech","M.Com","M.Sc.","M.A.","MBA","MCA","MS","Ph.D.",
+        ];
+    
+        // Function to show suggestions
+        function showSuggestions(input) {
+            const inputValue = input.value.toLowerCase();
+            const suggestionsContainer = document.getElementById('suggestions');
+            suggestionsContainer.innerHTML = '';
+    
+            const filteredSuggestions = degreeSuggestions.filter(suggestion =>
+                suggestion.toLowerCase().startsWith(inputValue)
+            );
+    
+            filteredSuggestions.forEach(suggestion => {
+                const suggestionElement = document.createElement('a');
+                suggestionElement.classList.add('list-group-item', 'list-group-item-action');
+                suggestionElement.textContent = suggestion;
+                suggestionElement.addEventListener('click', () => {
+                    input.value = suggestion;
+                    suggestionsContainer.innerHTML = '';
+                });
+                suggestionsContainer.appendChild(suggestionElement);
+            });
+        }
+    
+        // Get the input element
+        const degreeInput = document.getElementById('degreeInput');
+    
+        // Add event listener for input
+        degreeInput.addEventListener('input', function() {
+            showSuggestions(this);
+        });
+    </script>
+    <script>
+        // Function to validate Aadhar number
+        $('#aadhar_no').on('input', function() {
+            var aadharNo = $(this).val();
+            if (aadharNo.length < 12) {
+                $('#aadhar-error').text('Aadhar number must contain 12 digits.');
+            } else if (aadharNo.length > 12) {
+                $('#aadhar-error').text('Invalid Aadhar number.');
+            } else {
+                $('#aadhar-error').text('');
+            }
+        });
+    
+        // Function to validate PAN number
+        $('#pan_no').on('input', function() {
+            var panNo = $(this).val();
+            if (panNo.length < 10) {
+                $('#pan-error').text('PAN number must contain 10 characters.');
+            } else if (panNo.length > 10) {
+                $('#pan-error').text('Invalid PAN number.');
+            } else {
+                $('#pan-error').text('');
+            }
+        });
+    
+        // Trigger validation on form submission
+        $('form').submit(function() {
+            var aadharNo = $('#aadhar_no').val();
+            var panNo = $('#pan_no').val();
+    
+            // Validate Aadhar number
+            if (aadharNo.length !== 12) {
+                $('#aadhar-error').text('Aadhar number must contain exactly 12 digits.');
+                return false; // Prevent form submission
+            } else {
+                $('#aadhar-error').text('');
+            }
+    
+            // Validate PAN number
+            if (panNo.length !== 10) {
+                $('#pan-error').text('PAN number must contain exactly 10 characters.');
+                return false; // Prevent form submission
+            } else {
+                $('#pan-error').text('');
+            }
+    
+            // Form submission will continue if all validations pass
+            return true;
+        });
+    
+        
+        // Function to add new qualification fields
+        function addQualificationField() {
+            var newField = '<div class="qualification-set"><button type="button" class="close remove-qualification" aria-label="Close"><span aria-hidden="true">&times;</span></button><div class="form-row"><div class="form-group col-md-3"><label for="degreeInput">Degree</label><input type="text" class="form-control" id="degreeInput" name="degree_type" placeholder="Enter Degree"><div id="suggestions" class="list-group"></div></div><div class="form-group col-md-3"><label>Branch</label><input type="text" class="form-control" name="qualifications[]" placeholder="Enter Stream"></div><div class="form-group col-md-3"><label>Year of Graduation</label><input type="text" name="year_gra" class="form-control year_gra" inputmode="numeric" pattern="[0-9]*"/><div class="invalid-feedback">invalid</div></div><div class="form-group col-md-3"><label>Upload Proof</label><input type="file" name="certificate" class="form-control-file" accept=".pdf" /></div></div></div>';
+            $('#qualification_fields').append(newField);
+            // Disable the "Add Qualification" button after adding a new qualification field
+            $('.add-qualification').prop('enabled', true);
+        }
+    
+        // Add qualification fields when the plus button is clicked
+        $(document).on('click', '.add-qualification', function() {
+            addQualificationField();
+        });
+    
+        // Remove qualification fields when the close button is clicked
+        $(document).on('click', '.remove-qualification', function() {
+            $(this).closest('.qualification-set').remove();
+            // Enable the "Add Qualification" button after removing a qualification field
+            updateAddQualificationButton();
+        });
+    
+        // Validate year of graduation
+        $(document).on('input', '.year_gra', function() {
+            var year_gra = $(this).val();
+            var currentYear = new Date().getFullYear();
+            if (!isValidYear(year_gra, currentYear)) {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+            updateAddQualificationButton(); // Update button status after input
+        });
+    
+        // Function to validate the year of graduation
+        function isValidYear(year_gra, currentYear) {
+            return /^(19|20)\d{2}$/.test(year_gra) && parseInt(year_gra) <= currentYear;
+        }
+    
+        // Validate year of graduation before form submission
+        $('form').submit(function(event) {
+            var invalidFields = $(this).find('.year_gra.is-invalid');
+            if (invalidFields.length > 0) {
+                invalidFields.first().focus();
+                event.preventDefault();
+            }
+        });
+    
+        // Function to check if the "To" date is greater than the "From" date in a specific experience set
+        function checkDateValidity(experienceSet) {
+            var fromDate = experienceSet.find('input[name="from_date[]"]').val();
+            var toDate = experienceSet.find('input[name="to_date[]"]').val();
+            if (fromDate && toDate) {
+                return new Date(toDate) > new Date(fromDate);
+            }
+            return true; // If either date is not set, consider it valid
+        }
+    
+        // Function to update the "Add Experience" button state based on date validity
+        function updateAddExperienceButton() {
+            var allFieldsFilled = checkAllExperienceFields();
+            var allDatesValid = checkAllDatesValidity();
+            $('.add-experience').prop('disabled', !allFieldsFilled || !allDatesValid);
+        }
+    
+        // Call the function once when the document is ready to initially disable the button
+        updateAddExperienceButton();
+    
+        // Check fields when input happens in any of the experience fields
+        $(document).on('input', 'input[name="company[]"], input[name="designation[]"], input[name="from_date[]"], input[name="to_date[]"]', function() {
+            updateAddExperienceButton();
+        });
+    
+        // Function to add new experience fields
+        function addExperienceField() {
+            var lastWorkplace = $('.experience-set:last select[name="workplace"]').val(); // Get the value of the last workplace field
+            var newField = '<div class="experience-set"><div class="row"><div class="form-group col-md-3"><label>Organisation</label><input type="text" class="form-control" name="company[]" placeholder="Organisation Name"></div><div class="form-group col-md-2"><label>Designation</label><input type="text" class="form-control" name="designation[]" placeholder="Designation"></div><div class="form-group col-md-2"><label>Workplace</label><select name="workplace[]" class="form-control"><option value="" disabled selected>Select an option</option><option value="Industry" ' + (lastWorkplace === "Industry" ? "selected" : "") + '>Industry</option><option value="Institute" ' + (lastWorkplace === "Institute" ? "selected" : "") + '>Institute</option></select></div><div class="form-group col-md-2"><label>From</label><input type="date" class="form-control" name="from_date[]"></div><div class="form-group col-md-2"><label>To</label><input type="date" class="form-control" name="to_date[]"></div></div><div class="row"><div class="form-group col-md-12"><button type="button" class="close remove-qualification" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></div></div>';
+            $('#experience_fields').append(newField);
+            // Add the close button only if there are more than one experience fields
+            if ($('.experience-set').length > 1) {
+                $('.experience-set:last .row:last').remove(); // Remove the default close button
+                $('.experience-set:last .row:first').append('<div class="form-group col-md-1"><button type="button" class="close remove-experience" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+            }
+            updateAddExperienceButton(); // Update button status after adding new experience field
+        }
+    
+        // Add experience fields when the button is clicked
+        $(document).on('click', '.add-experience', function() {
+            addExperienceField();
+        });
+        
+        // Function to handle removal of experience field
+        $(document).on('click', '.remove-experience', function() {
+            $(this).closest('.experience-set').remove();
+            updateAddExperienceButton(); // Update button status after removing experience field
+        });
+    
+        // Function to check if all fields in all experience sets are filled
+        function checkAllExperienceFields() {
+            var allFieldsFilled = true;
+            $('.experience-set').each(function() {
+                var organization = $(this).find('input[name="company[]"]').val();
+                var designation = $(this).find('input[name="designation[]"]').val();
+                var fromDate = $(this).find('input[name="from_date[]"]').val();
+                var toDate = $(this).find('input[name="to_date[]"]').val();
+                if (!organization || !designation || !fromDate || !toDate) {
+                    allFieldsFilled = false;
+                    return false; // Stop iterating further if any field is empty
+                }
+            });
+            return allFieldsFilled;
+        }
+    
+        // Function to check if all "To" dates are greater than the corresponding "From" dates
+        function checkAllDatesValidity() {
+            var allDatesValid = true;
+            $('.experience-set').each(function() {
+                if (!checkDateValidity($(this))) {
+                    allDatesValid = false;
+                    return false; // Stop iterating further if any date is invalid
+                }
+            });
+            return allDatesValid;
+        }
+    
+        // Function to validate phone number
+        $(document).on('input', '#phone', function() {
+            var phone = $(this).val();
+            if (phone.length !== 10 || isNaN(phone)) {
+                $('#phone-error').text('Phone number must be a 10-digit number.');
+            } else {
+                $('#phone-error').text('');
+            }
+        });
+
+        function updateAddExperienceButton() {
+            var allFieldsFilled = checkAllExperienceFields();
+            var allDatesValid = checkAllDatesValidity();
+            $('.add-experience').prop('disabled', !allFieldsFilled || !allDatesValid);
+    
+            // Convert current_from_date to 'YYYY-MM-DD' format
+            var currentFromDateInput = $('input[name="current_from_date"]');
+            var currentFromDateValue = currentFromDateInput.val();
+            if (currentFromDateValue) {
+                var currentDate = new Date(currentFromDateValue);
+                var formattedDate = currentDate.toISOString().split('T')[0];
+                currentFromDateInput.val(formattedDate);
+            }
+        }
+        // Call the function once when the document is ready to initially disable the button
+        updateAddExperienceButton();
+    
+        // Check fields when input happens in any of the experience fields
+        $(document).on('input', 'input[name="company[]"], input[name="designation[]"], input[name="from_date[]"], input[name="to_date[]"]', function() {
+            updateAddExperienceButton();
+        });
+        $(document).ready(function() {
+            $('.specialization-button').click(function() {
+                $('.specialization-button').removeClass('selected');
+                $(this).addClass('selected');
+                
+                var specialization = $(this).text();
+                $('#area_of_specialization').val(specialization);
+            });
+            
+            // Add click event handler for the "Add" button inside the modal
+            $('#addOthers').click(function() {
+                var otherSpecialization = $('#othersInput').val(); // Get the value from the input field
+                
+                if (otherSpecialization.trim() !== '') { // Check if the value is not empty
+                    $('#area_of_specialization').val(otherSpecialization); // Set the value in the hidden input field
+                    $('#othersModal').modal('hide'); // Close the modal
+                    
+                    // Display a message
+                    alert('Update your profile to continue');
+                } else {
+                    // Optionally, you can show an error message or handle the empty input case
+                    console.log('Please enter a specialization');
+                }
+            });
+        });
+        
+        
+    </script>
+    
+
+{% endblock main_content %}

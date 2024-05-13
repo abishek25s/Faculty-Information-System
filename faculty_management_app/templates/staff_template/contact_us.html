@@ -1,0 +1,134 @@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+{% extends 'staff_template/base_template.html' %}
+{% block page_title %}
+    Contact Us
+{% endblock page_title %}
+{% block main_content %}
+{% load static %}
+<style>
+    .button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #000080;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 16px; /* Reduced font size */
+        padding: 10px 20px; /* Reduced padding */
+        width: auto; /* Adjusted width */
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+    .button span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .button span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+
+    .button:hover span {
+        padding-right: 25px;
+    }
+
+    .button:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+    .button-container {
+        text-align: center;
+    }
+</style>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    {% comment %} Display Messages {% endcomment %}
+                    {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <form method="POST" action="{% url 'staff_contact_save' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                <label>Faculty Name</label>
+                                <input type="text" name="staff_name" class="form-control" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>Email</label>
+                                <input type="email" name="email" class="form-control" value="{{ request.user.email }}" disabled />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>Message</label>
+                                <input type="textarea" name="message" class="form-control" />
+                            </div>                                                                                                                        
+                        </div>
+                    </div>
+                    <div class="button-container">
+                        <button id="add_publication_button" class="button" style="vertical-align:middle"><span>Submit</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+{% endblock main_content %}
+{% block custom_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelector('form').addEventListener('submit', function (event) {
+            var requiredFields = ['staff_name', 'email', 'message'];
+            var filled = true;
+            requiredFields.forEach(function(field) {
+                var input = document.querySelector('[name="' + field + '"]');
+                if (!input.value.trim()) {
+                    filled = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+            if (!filled) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock custom_js %}

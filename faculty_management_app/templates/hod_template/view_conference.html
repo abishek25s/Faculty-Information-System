@@ -1,0 +1,421 @@
+<!-- hod_template/view_publications.html -->
+
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    View Conference
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.21/jspdf.plugin.autotable.min.js"></script>
+<section class="content">
+    {% if messages %}
+        <div class="form-group">
+            <div class="col-12">
+                {% for message in messages %}
+                    {% if message.tags == "error" %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                            style="margin-top: 10px;">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% elif message.tags == "success" %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                            style="margin-top: 10px;">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="filter-options" style="margin-top: 20px;">
+                        <form action="{{ request.path }}" method="get">
+                            <label for="academic_year">Filter by Academic Year:</label>
+                            <select name="academic_year" id="academic_year">
+                                <option value="">All</option>
+                                {% for year in academic_years %}
+                                    <option value="{{ year }}" {% if year == selected_academic_year %} selected {% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>        
+                            <button type="submit" class="btn btn-default btn-sm"><i class="fas fa-filter"></i></button>
+                            <label for="staff_name">Filter by Faculty Name:</label>
+                            <select name="staff_name" id="staff_name">
+                                <option value="">All</option>
+                                {% for staff in staffs %}
+                                    <option value="{{ staff.id }}" {% if staff.id == selected_staff_id %} selected {% endif %}>{{ staff.salutation }} {{ staff.admin.get_full_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-default btn-sm"><i class="fas fa-filter"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Publication Details</h3>
+
+                    <div class="card-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                            <input type="text" id="table_search" name="table_search" class="form-control float-right" placeholder="Search">
+
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap" id="publicationsTable">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Author</th>
+                                <th>Title</th>
+                                <th>Department</th>
+                                <th>Affiliating Institute at the time of publication</th>
+                                <th>Name of the Conference</th>
+                                <th>Index</th>
+                                <th>Year of Publication</th>
+                                <th>ISBN/ISSN Number</th>
+                                <th>DOI Number</th>
+                                <th>Scopus ID</th>
+                                <th>Link to the Journal Website</th>
+                                <th>Download PDF</th> <!-- Added column for PDF downloads -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for publication in publications %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td> <!-- Serial number -->
+                                        <td>{{publication.staff_id.salutation}} {{ publication.staff_id.admin.get_full_name }}</td>
+                                        <td>{{ publication.title }}</td>
+                                        <td>{{ publication.department }}</td>
+                                        <td>{{ publication.affiliating_institute }}</td>
+                                        <td>{{ publication.journal_name }}</td>
+                                        <td>{{ publication.journal_index }}</td>
+                                        <td>{{ publication.year_of_publication }}</td>
+                                        <td>{{ publication.isbn_issn_number }}</td>
+                                        <td>{{ publication.doi_number }}</td>
+                                        <td>{{ publication.scopus_id }}</td>
+                                        <td><a href="{{ publication.journal_website }}" target="_blank">Click here to open</a></td>
+                                        <td>
+                                            {% if publication.journal_pdf %}
+                                                <a href="{{ publication.journal_pdf.url }}" target="_blank">Download</a>
+                                            {% else %}
+                                                Not available
+                                            {% endif %}
+                                        </td> <!-- Added cell for PDF download link -->
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8">No Conference found.</td>
+                                    </tr>
+                                {% endfor %}                       
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="download-options" style="margin-bottom: 20px;">
+        <div style="text-align:end;">
+            <!-- Button triggers the JavaScript function to download the table as Excel -->
+            <button onclick="downloadTableAsExcel()" class="btn btn-success">Download as Excel</button>
+            <!-- Button triggers the JavaScript function to download the table as PDF -->
+            <button onclick="downloadTableAsPDF()" class="btn btn-danger">Download as PDF</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card card-gray">
+                <div class="card-header">
+                    <h3 class="card-title">Summary based on Individual Faculty count</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Faculty Name</th>
+                                <th>Designation</th>
+                                <th>No. of Journal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for staff in staff_queryset %}
+                                {% if staff.publication_count > 0 %}
+                                    <tr>
+                                        <td>{{ staff.salutation }} {{ staff.admin.get_full_name }}</td>
+                                        <td>{{ staff.designation }}</td>
+                                        <td>{{ staff.publication_count }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>                   
+        </div>
+        <div class="col-md-6">
+            <div class="card card-gray"> 
+                <div class="card-header">
+                    <h3 class="card-title">Summary based on Academic Year</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Academic Year</th>
+                                <th>No. of Journal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for year_count in publications_count_per_year %}
+                            <tr>
+                                <td>{{ year_count.academic_year }}</td>
+                                <td>{{ year_count.publication_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>                   
+            </div>
+        </div>
+    </div>
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('table_search');
+        input.addEventListener('input', function() {
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById('publicationsTable');
+            var rows = table.getElementsByTagName('tr');
+    
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                var found = false;
+                for (var j = 0; j < cells.length; j++) {
+                    var cell = cells[j];
+                    if (cell) {
+                        var textValue = cell.textContent || cell.innerText;
+                        if (textValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (found) {
+                    rows[i].style.display = '';
+                } else {
+                    if (rows[i].getElementsByTagName('th').length === 0) {
+                        rows[i].style.display = 'none';
+                    } else {
+                        rows[i].style.display = '';
+                    }
+                }
+            }
+        });
+    });
+
+    function togglePopup() {
+        var popup = document.getElementById("popupContainer");
+        if (popup.style.display === "none" || popup.style.display === "") {
+            popup.style.display = "block";
+            renderPieChart(); // Render pie chart when popup is opened
+        } else {
+            popup.style.display = "none";
+        }
+    }
+
+    function closePopup() {
+        var popup = document.getElementById("popupContainer");
+        popup.style.display = "none";
+    }
+
+    function renderPieChart() {
+        var staffNames = [];
+        var publicationCounts = [];
+   
+
+        var ctx = document.getElementById('pieChart').getContext('2d');
+        var pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: staffNames,
+                datasets: [{
+                    label: 'Publication Count',
+                    data: publicationCounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+   
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script>
+    function downloadTableAsExcel() {
+        var table = document.getElementById("publicationsTable");
+        if (!table) {
+            console.error('Table element not found.');
+            return;
+        }
+    
+        var wb = XLSX.utils.table_to_book(table, {sheet:"Sheet JS", raw:true});
+    
+        var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:true, type: 'binary'});
+    
+        function s2ab(s) {
+            var buf = new ArrayBuffer(s.length);
+            var view = new Uint8Array(buf);
+            for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        }
+    
+        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), "Conference.xlsx");
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('table_search');
+        input.addEventListener('input', function() {
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById('publicationsTable');
+            var rows = table.getElementsByTagName('tr');
+    
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                var found = false;
+                for (var j = 0; j < cells.length; j++) {
+                    var cell = cells[j];
+                    if (cell) {
+                        var textValue = cell.textContent || cell.innerText;
+                        if (textValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (found) {
+                    rows[i].style.display = '';
+                } else {
+                    if (rows[i].getElementsByTagName('th').length === 0) {
+                        rows[i].style.display = 'none';
+                    } else {
+                        rows[i].style.display = '';
+                    }
+                }
+            }
+        });
+    });
+    
+    function downloadTableAsPDF() {
+        var filter = document.getElementById('table_search').value.toUpperCase();
+        var table = document.getElementById("publicationsTable");
+        if (!table) {
+            console.error('Table element not found.');
+            return;
+        }
+    
+        var tableRows = table.querySelectorAll('tr');
+        if (tableRows.length < 2) {
+            console.error('Table has insufficient rows.');
+            return;
+        }
+    
+        var doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'pt',
+            format: [1200, 800]
+        }); 
+    
+        var headers = [];
+        var headerCells = tableRows[0].querySelectorAll('th');
+        for (var i = 0; i < headerCells.length; i++) {
+            headers.push(headerCells[i].textContent.trim());
+        }
+    
+        var data = [];
+        for (var i = 1; i < tableRows.length; i++) {
+            var rowData = [];
+            var cells = tableRows[i].querySelectorAll('td');
+            var rowMatch = false;
+            for (var j = 0; j < cells.length; j++) {
+                var cellData = cells[j].textContent.trim();
+                if (cellData.toUpperCase().includes(filter)) {
+                    rowMatch = true;
+                }
+                rowData.push(cellData);
+            }
+            if (rowMatch || filter === '') {
+                data.push(rowData);
+            }
+        }
+    
+        if (data.length < 1) {
+            console.error('No matching data found for the provided search.');
+            return;
+        }
+    
+        doc.autoTable({
+            head: [headers],
+            body: data,
+            startY: 50,
+            theme: 'grid',
+            styles: {
+                cellPadding: 5,
+                fontSize: 10,
+                valign: 'middle',
+                overflow: 'linebreak'
+            },
+            columnStyles: {
+                0: {cellWidth: 100},
+                1: {cellWidth: 100},
+            }
+        });
+    
+        doc.save('Conferences_data.pdf');
+    }
+</script>
+
+{% endblock main_content %}
+
+

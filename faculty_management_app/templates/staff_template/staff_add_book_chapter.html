@@ -1,0 +1,246 @@
+<!-- Include Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Include Font Awesome for calendar icon -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- Include Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    Add Book Chapter
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<style>
+    .button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #000080;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 16px; /* Reduced font size */
+        padding: 10px 20px; /* Reduced padding */
+        width: auto; /* Adjusted width */
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .button span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .button span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+
+    .button:hover span {
+        padding-right: 25px;
+    }
+
+    .button:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+    .button-container {
+        text-align: center;
+    }
+</style>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    
+                    <!-- /.card-header -->
+
+                    {% comment %} Display Messages {% endcomment %}
+                    {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'staff_add_book_chapter_save' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="form-group col-md-4">
+                                <label>Author Name</label>
+                                <input type="text" name="author_name" id="author_name"class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Book Chapter Title</label>
+                                <input type="text" name="book_chapter_title" id="book_chapter_title" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Publisher Name</label>
+                                <input type="text" name="publisher_name" id="publisher_name" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>ISBN Number</label>
+                                <input type="text" name="isbn_no" id="isbn_no" class="form-control" inputmode="numeric" />
+                                <div class="invalid-feedback">
+                                    Please enter a valid ISBN number.
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Month & Year of Publication</label>
+                                <div class="input-group">
+                                    <input type="month" id="month_year_publication" name="month_year_publication" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>DOI/IF</label>
+                                <input type="text" name="doi_if" id="doi_if" class="form-control" />
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Is Indexed in SCOPUS?</label>
+                                <div class="form-check">
+                                    <input type="radio" id="scopus_yes" name="is_scopus_indexed" value="True" class="form-check-input">
+                                    <label for="scopus_yes" class="form-check-label">Yes</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" id="scopus_no" name="is_scopus_indexed" value="False" class="form-check-input">
+                                    <label for="scopus_no" class="form-check-label">No</label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group col-md-6">
+                                <label>Affiliating Institution Same at Time of Publication?</label>
+                                <div class="form-check">
+                                    <input type="radio" id="affiliation_yes" name="affiliating_institution_same" value="True" class="form-check-input">
+                                    <label for="affiliation_yes" class="form-check-label">Yes</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" id="affiliation_no" name="affiliating_institution_same" value="False" class="form-check-input">
+                                    <label for="affiliation_no" class="form-check-label">No</label>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group col-md-6">
+                                <label>Book Chapter Link</label>
+                                <input type="text" name="paper_link" id="paper_link" class="form-control" />
+                            </div>
+
+                            
+                            <div class="form-group col-md-6">
+                                <label>Scopus Link</label>
+                                <input type="text" name="scopus_link" id="scopus_link" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <button id="add_publication_button" class="button" style="vertical-align:middle"><span>Add Book Chapter </span></button>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    var currentDate = new Date();
+    var currentYear = currentDate.getFullYear();
+    var currentMonth = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Adding 1 because JavaScript months are zero-based
+    document.getElementById('month_year_publication ').setAttribute('max', currentYear + '-' + currentMonth);
+</script>
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    var isbnInput = document.getElementById('isbn_no');
+    
+    isbnInput.addEventListener('input', function() {
+        var isbnValue = this.value.trim();
+        if (isbnValue.length !== 8 || isNaN(parseInt(isbnValue))) { // Check if ISBN has exactly 8 digits and is numeric
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+});
+document.querySelector('form').addEventListener('submit', function (event) {
+    var requiredFields = ['author_name', 'book_chapter_title', 'publisher_name', 'month_year_publication', 'isbn_no', 'doi_if', 'paper_link', 'scopus_link'];
+    var filled = true;
+
+    requiredFields.forEach(function(field) {
+        var input = document.querySelector('[name="' + field + '"]');
+        if (!input.value.trim()) {
+            filled = false;
+            input.classList.add('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+        }
+    });
+
+    var isbnInput = document.getElementById('isbn_no');
+    var isbnValue = isbnInput.value.trim();
+    if (isbnValue.length !== 8 || isNaN(parseInt(isbnValue))) { // Check if ISBN has exactly 8 digits and is numeric
+        filled = false;
+        isbnInput.classList.add('is-invalid');
+    } else {
+        isbnInput.classList.remove('is-invalid');
+    }
+
+    if (!filled) {
+        event.preventDefault();
+    }
+});
+</script>
+{% endblock custom_js %}

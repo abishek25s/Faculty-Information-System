@@ -1,0 +1,414 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+{{ staff.salutation }} {{ staff.admin.first_name }} {{ staff.admin.last_name }} - {{ staff.designation }}
+{% endblock page_title %}
+
+{% block main_content %}
+<style>
+    #chartCanvas {
+        max-width: 1000px;
+        margin: auto; /* Center the canvas if the container is wider */
+    }
+    .info-icon {
+        color: #17a2b8; /* Bootstrap's info color for consistency */
+        margin-right: 10px;
+    }
+    .profile-info {
+        margin-bottom: 20px;
+    }
+    .profile-info strong {
+        display: block;
+        color: #343a40; /* Dark gray */
+    }
+    .profile-info span {
+        font-size: 16px;
+    }
+    .contribution-icon {
+        margin-right: 10px;
+    }
+    .progress {
+        height: 20px; /* Makes the progress bars thinner */
+    }
+    .progress-bar {
+        background-color: #007bff; /* Primary color */
+    }
+    .contribution-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .contribution-item i {
+        margin-right: 15px;
+        color: #17a2b8; /* Bootstrap info color for consistency, or choose your own */
+    }
+
+    .contribution-item div {
+        font-size: 16px;
+    }
+    .chart-container {
+        width: 100%; /* Make the chart container take the full width of its parent */
+        max-width: 1000px; /* Optional: Set a max-width to prevent the chart from becoming too wide on large screens */
+        margin: auto; /* Center the container */
+        aspect-ratio: 16 / 9; /* Adjust the aspect ratio as needed */
+    }
+
+    #publicationChart {
+        width: 100% !important;
+        height: auto !important;
+    } 
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end; /* Aligns buttons to the right */
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-icon-only {
+        position: relative;
+        width: 40px;
+        overflow: hidden;
+        transition: width 0.3s ease;
+    }
+
+    .btn-icon-only .btn-text {
+        display: none; /* Initially hide the text */
+        transition: opacity 0.3s ease;
+    }
+
+    .btn-icon-only:hover {
+        width: auto; /* Expand button width on hover */
+    }
+
+    .btn-icon-only:hover .btn-text {
+        display: inline; /* Show text on hover */
+        opacity: 1;
+    }
+
+    /* Additional styles for hover effect */
+    .btn-icon-only:hover .btn-text {
+        opacity: 1;
+    }
+
+    .container-fit-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 150px; /* Set the height of the container */
+        width: 150px; /* Set the width of the container */
+    }
+
+    .card1 {
+        max-width: 100%;
+        max-height: 100%;
+        border: 2.5px solid #000000; /* Add border styling */
+
+    }
+    .qualification-list {
+        list-style-type: none;
+    }
+
+    .qualification-list li {
+        margin-top: 3px;
+        margin-bottom: 7px; /* Adjust margin as needed */
+    }
+
+</style>
+
+{% load static %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                {% comment %} Display Messages {% endcomment %}
+                    {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                                            style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                <div class="card card-primary card-outline">
+                    <div class="card-body">
+                        <h4>Profile</h4>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Name:</strong> <span>{{ staff.salutation }}.{{ staff.admin.first_name }} {{ staff.admin.last_name }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Email:</strong> <span>{{ staff.admin.email }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Phone:</strong> <span>{{ staff.phone }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Designation:</strong> <span>{{ staff.get_designation_display }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Address:</strong> <span>{{ staff.address }}</span>
+                                    </div>
+                                    <div class="col-md-4 profile-info">
+                                        <strong>Experience</strong> <span>{{ experience_years }} years & {{ experience_months }} months</span>
+                                    </div>
+                                    <div class="col-md-5 profile-info">
+                                        <strong>Qualifications:</strong>
+                                        <ul class="list-group list-group-flush">
+                                            <div class="qualification-list">
+                                                {% for qualification in qualifications %}
+                                                {% if qualification.certificate %}
+                                                <li><i class="fas fa-graduation-cap mr-2"></i><a href="{{ qualification.certificate.url }}" target="_blank">{{ qualification.degree }} in {{ qualification.stream }}, Graduated in {{ qualification.year_of_graduation }}</a></li>
+                                                {% else %}
+                                                <li><i class="fas fa-graduation-cap mr-2"></i>{{ qualification.degree }} in {{ qualification.stream }}, Graduated in {{ qualification.year_of_graduation }}</li>
+                                                {% endif %}
+                                                {% empty %}
+                                                <li>No qualifications listed.</li>
+                                                {% endfor %}
+                                            </div>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="col-md-7 profile-info">
+                                        <strong>Experiences:</strong>
+                                        <ul class="list-group list-group-flush">
+                                            <div class="qualification-list">
+                                                {% for experience in experience %}
+                                                <li><i class="fas fa-briefcase mr-2"></i>{{ experience.organization }} as {{ experience.designation }}, from {{ experience.from_date|date:"Y-m-d" }} to {{ experience.to_date|date:"Y-m-d" }}</li>
+                                                {% empty %}
+                                                <li>No experiences listed.</li>
+                                                {% endfor %}
+                                            </div>
+                                        </ul>
+                        
+                                        <strong>Current Experience:</strong>
+                                        <ul class="list-group list-group-flush">
+                                            <div class="qualification-list">
+                                                {% if current_experience.is_relieved %}
+                                                <li><i class="fas fa-sync mr-2"></i>{{ current_experience.organization }} as {{ staff.designation }}, from {{ current_experience.from_date|date:"Y-m-d" }} to {{ current_experience.to_date|date:"Y-m-d" }}</li>
+                                                {% else %}
+                                                <li><i class="fas fa-sync mr-2"></i>{{ current_experience.organization }} as {{ staff.designation }}, from {{ current_experience.from_date|date:"Y-m-d" }} to Present</li>
+                                                {% endif %}
+                                            </div>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 profile-info">
+                                <div class="container-fit-content">
+                                    {% if staff.profile_picture %}
+                                        <img src="{{ staff.profile_picture.url }}" class="card1">
+                                    {% else %}
+                                        <p>No profile picture available</p>
+                                    {% endif %}
+                                </div>
+                            </div>                                  
+                        </div>
+
+                        <!-- Academic Profiles -->
+                        {% if staff.scopus_website %}
+                            <p><strong>Scopus Profile:</strong> <a href="{{ staff.scopus_website }}" target="_blank">View Profile</a></p>
+                        {% endif %}
+                        {% if staff.google_website %}
+                            <p><strong>Google Scholar Profile:</strong> <a href="{{ staff.google_website }}" target="_blank">View Profile</a></p>
+                        {% endif %}
+
+                        <hr>
+                    <h4>Contributions</h4><br>
+                    <div class="row">
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-book-open fa-2x"></i>
+                            <div>
+                                <strong>Journals Published:</strong>
+                                <span>{{ journal_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-users fa-2x"></i>
+                            <div>
+                                <strong>Conference Papers:</strong>
+                                <span>{{ conference_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-book fa-2x"></i>
+                            <div>
+                                <strong>Books Authored/Edited:</strong>
+                                <span>{{ book_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-file-alt fa-2x"></i>
+                            <div>
+                                <strong>Book Chapters:</strong>
+                                <span>{{ book_chapter_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-copy fa-2x"></i>
+                            <div>
+                                <strong>Copyrights:</strong>
+                                <span>{{ copyright_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-lightbulb fa-2x"></i>
+                            <div>
+                                <strong>Patents:</strong>
+                                <span>{{ patent_count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-briefcase fa-2x"></i> 
+                            <div>
+                                <strong>Consultancy Projects:</strong>
+                                <span>{{ consultancy_project_count }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-cogs fa-2x"></i> 
+                            <div>
+                                <strong>Product Developed:</strong>
+                                <span>{{ product_developed_count }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 contribution-item">
+                            <i class="fas fa-tasks fa-2x"></i> 
+                            <div>
+                                <strong>Projects Proposed:</strong>
+                                <span>{{ project_proposal_count }}</span>
+                            </div>
+                        </div>
+                    </div>              
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit and Delete buttons -->
+    <section class="content">s
+        <div class="container-fluid">
+            <div class="action-buttons">
+                <a class="btn btn-danger btn-icon-only text-white" id='relieveButton'>
+                    <i class="fas fa-user-times"></i><span class="btn-text"> Relieve</span>
+                </a>                                
+                <a href="{% url 'edit_staff' staff.admin.id %}" class="btn btn-success btn-icon-only">
+                    <i class="fas fa-edit"></i><span class="btn-text">Edit</span>
+                </a>
+                <button class="btn btn-danger btn-icon-only" id="deleteButton">
+                    <i class="fas fa-trash-alt"></i><span class="btn-text">Delete</span>
+                </button>
+            </div><br>
+        </div>
+    </section>     
+</section>
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="modal fade" id="confirmationRelieveModal" tabindex="-1" role="dialog" aria-labelledby="confirmationRelieveModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationRelieveModalLabel">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to relieve this faculty? <br>This process is irreversible.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmRelieveButton">Relieve</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the relieve button
+        var relieveButton = document.getElementById('relieveButton');
+
+        // Attach click event listener to the relieve button
+        relieveButton.addEventListener('click', function() {
+            // Show the confirmation modal
+            $('#confirmationRelieveModal').modal('show');
+        });
+
+        // Get the confirm relieve button inside the modal
+        var confirmRelieveButton = document.getElementById('confirmRelieveButton');
+
+        // Attach click event listener to the confirm relieve button
+        confirmRelieveButton.addEventListener('click', function() {
+            // Get the URL for the relieve operation
+            var relieveUrl = "{% url 'relieve_staff' staff.admin.id %}";
+
+            // Redirect to the relieve URL
+            window.location.href = relieveUrl;
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the delete button
+        var deleteButton = document.getElementById('deleteButton');
+
+        // Attach click event listener to the delete button
+        deleteButton.addEventListener('click', function() {
+            // Show the confirmation modal
+            $('#confirmationModal').modal('show');
+        });
+
+        // Get the confirm delete button inside the modal
+        var confirmDeleteButton = document.getElementById('confirmDeleteButton');
+
+        // Attach click event listener to the confirm delete button
+        confirmDeleteButton.addEventListener('click', function() {
+            // Get the URL for the delete operation
+            var deleteUrl = "{% url 'delete_staff' staff.admin.id %}";
+
+            // Redirect to the delete URL
+            window.location.href = deleteUrl;
+        });
+    });
+</script>
+{% endblock main_content %}

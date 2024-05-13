@@ -1,0 +1,226 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+Statistical Details
+{% endblock page_title %}
+
+{% block main_content %}
+{% load static %}
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Filter form -->
+            <div class="card">
+                <div class="card-header">
+                    <form action="{{ request.path }}" method="get">
+                        <label for="academic_year">Filter by Academic Year:</label>
+                        <select name="academic_year" id="academic_year">
+                            <option value="">All</option>
+                            {% for year in academic_years %}
+                                <option value="{{ year }}" {% if year == selected_academic_year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-default btn-sm"><i class="fas fa-filter"></i> </button>
+                    </form>
+                </div>
+            </div>
+            <!-- Books table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Statistical Details</h3>
+                    <div class="card-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                            <input type="text" id="table_search" name="table_search" class="form-control float-right" placeholder="Search">
+
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap text-center" id="publicationsTable">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Faculty</th>
+                                <th>Journal</th>
+                                <th>Conference</th>
+                                <th>Books</th>
+                                <th>Book Chapters</th>
+                                <th>Copyrights</th>
+                                <th>Patents</th>
+                                <th>Certifications</th>
+                                <th>Attended AC</th>
+                                <th>Organized AC</th>
+                                <th>Consultancy Projects</th>
+                                <th>Product Development</th>
+                                <th>Project Proposal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            {% for stat in statistics %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td class="text-left">{{ stat.staff_member.salutation }} {{ stat.staff_member.admin.get_full_name }}</td>
+                                    <td>{{ stat.journal_count }}</td>
+                                    <td>{{ stat.conference_count }}</td>
+                                    <td>{{ stat.book_count }}</td>
+                                    <td>{{ stat.book_chapter_count }}</td>
+                                    <td>{{ stat.copyright_count }}</td>
+                                    <td>{{ stat.patent_count }}</td>
+                                    <td>{{ stat.certification_count }}</td>
+                                    <td>{{ stat.attended_ac_count }}</td>
+                                    <td>{{ stat.organized_ac_count }}</td>
+                                    <td>{{ stat.consultancy_project_count }}</td>
+                                    <td>{{ stat.product_development_count }}</td>
+                                    <td>{{ stat.project_proposal_count }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="10">No statistics found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>                       
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="download-options" style="margin-bottom: 20px;">
+        <div style="text-align:end;">
+            <!-- Button triggers the JavaScript function to download the table as Excel -->
+            <button onclick="downloadTableAsExcel()" class="btn btn-success">Download as Excel</button>
+            
+            <!-- Button triggers the JavaScript function to download the table as PDF -->
+            <button onclick="downloadTableAsPDF()" class="btn btn-danger">Download as PDF</button>
+        </div>
+    </div>
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.21/jspdf.plugin.autotable.min.js"></script>
+<script>
+function downloadTableAsExcel() {
+        var table = document.getElementById("publicationsTable"); // Ensure your table has this ID
+        var wb = XLSX.utils.table_to_book(table, {sheet:"Sheet JS", raw:true});
+       
+        // Modify the workbook data before downloading
+        var ws = wb.Sheets["Sheet JS"];
+        for (var i = 1; i < ws.length; i++) { // Start from index 1 to skip header row
+            var yearCell = ws[i]['I']; // Assuming 'I' is the column for Year of Publication
+            if(yearCell) {
+                var year = yearCell.v.split("-")[0]; // Extract only the year part
+                yearCell.v = year; // Update the cell value
+                yearCell.w = year; // Update the cell display value
+            }
+        }
+       
+        var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:true, type: 'binary'});
+
+        function s2ab(s) {
+            var buf = new ArrayBuffer(s.length);
+            var view = new Uint8Array(buf);
+            for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        }
+       
+        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), "Statistics.xlsx");
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('table_search');
+        input.addEventListener('input', function() {
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById('publicationsTable');
+            var rows = table.getElementsByTagName('tr');
+    
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                var found = false;
+                for (var j = 0; j < cells.length; j++) {
+                    var cell = cells[j];
+                    if (cell) {
+                        var textValue = cell.textContent || cell.innerText;
+                        if (textValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (found) {
+                    rows[i].style.display = '';
+                } else {
+                    if (rows[i].getElementsByTagName('th').length === 0) {
+                        rows[i].style.display = 'none';
+                    } else {
+                        rows[i].style.display = '';
+                    }
+                }
+            }
+        });
+    });
+    function downloadTableAsPDF() {
+        console.log('Download as PDF button clicked.'); // Log to check if the function is invoked
+        
+        var table = document.getElementById("publicationsTable");
+        if (!table) {
+            console.error('Table element not found.');
+            return;
+        }
+    
+        var tableRows = table.querySelectorAll('tr');
+        if (tableRows.length < 2) {
+            console.error('Table has insufficient rows.');
+            return;
+        }
+    
+        // Create a jsPDF instance with custom page size and orientation
+         var doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'pt', // Use points as the unit
+            format: [1200, 800] // Set custom width and height for a horizontally long page
+        }); 
+    
+        var headers = [];
+        var headerCells = tableRows[0].querySelectorAll('th');
+        for (var i = 0; i < headerCells.length; i++) {
+            headers.push(headerCells[i].textContent.trim());
+        }
+    
+        var data = [];
+        for (var i = 1; i < tableRows.length; i++) {
+            var rowData = [];
+            var cells = tableRows[i].querySelectorAll('td');
+            for (var j = 0; j < cells.length; j++) {
+                rowData.push(cells[j].textContent.trim());
+            }
+            data.push(rowData);
+        }
+    
+        // Add the table-like structure using Autotable plugin
+        doc.autoTable({
+            head: [headers],
+            body: data,
+            startY: 50, // Start the table at this Y position
+            theme: 'grid', // Use grid theme for neat alignment
+            styles: {
+                cellPadding: 5,
+                fontSize: 10,
+                valign: 'middle', // Vertically align the content in the cells
+                overflow: 'linebreak' // Handle line breaks within cells
+            },
+            columnStyles: { // Adjust column widths if necessary
+                0: {cellWidth: 100},
+                1: {cellWidth: 100},
+                // Add more columnStyles as needed
+            }
+        });
+    
+        // Save the PDF
+        doc.save('Stats.pdf');
+    }
+</script>
+{% endblock main_content %}

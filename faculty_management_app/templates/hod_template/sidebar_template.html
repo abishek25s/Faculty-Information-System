@@ -1,0 +1,185 @@
+{% load static %}
+
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="{% url 'admin_home' %}" class="brand-link">
+        <img src="{% static 'dist/img/peclogo.png' %}" alt="CollegeLogo" class="brand-image"
+            style="opacity: .8">
+        <span class="brand-text font-weight-light">PEC</span>
+    </a>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
+          <div class="image">
+            <!-- Using a FontAwesome icon as a placeholder; replace with an <img> tag if using avatars -->
+            <i class="fas fa-user-circle fa-2x text-white"></i>
+          </div>
+          <div class="info">
+            <a class="d-block" style="margin-left: 10px; font-size: 16px; font-weight: bold; color: #FFFFFF;">
+              {{ user.first_name }} {{ user.last_name }}
+            </a>
+          </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Add icons to the links using the .nav-icon class
+                with font-awesome or any other icon font library -->
+                <li class="nav-item">
+                  {% url 'admin_profile' as admin_profile %}
+                  <a href="{{ admin_profile }}" class="nav-link {% if request.path == admin_profile %} active {% endif %}">
+                      <i class="nav-icon fas fa-user"></i> <!-- Change the icon if needed -->
+                      <p>
+                          Staff Profile
+                      </p>
+                  </a>
+                </li>
+            <li class="nav-item">
+              {% url 'admin_home' as admin_home %}
+              <a href="{{ admin_home }}" class="nav-link {% if request.path == admin_home %} active {% endif %}">
+                <i class="nav-icon fas fa-home"></i>
+                <p>
+                  Home
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'manage_staff' as manage_staff %}
+              {% url 'edit_staff' staff_id=id as edit_staff %}
+              <a href="{{ manage_staff }}" class="nav-link {% if request.path == manage_staff %} active {% endif %} {% if request.path == edit_staff %} active {% endif %}">
+                <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                <p>
+                  Manage Staff
+                </p>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              {% url 'add_staff' as add_staff %}
+              <a href="{{ add_staff }}" class="nav-link {% if request.path == add_staff %} active {% endif %}">
+                <i class="nav-icon fas fa-plus"></i>
+                <p>
+                  Add Staff
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'statistical_table' as statistical_table %}
+              <a href="{{ statistical_table }}" class="nav-link {% if request.path == statistical_table %} active {% endif %}">
+                  <i class="nav-icon ion ion-stats-bars"></i>
+                  <p>
+                      Statistical Table
+                  </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'view_publications' as view_publications %}
+              <a href="{{ view_publications }}" class="nav-link {% if request.path == view_publications %} active {% endif %}">
+                  <i class="nav-icon fas fa-eye"></i>
+                  <p>
+                      Publications
+                  </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              {% url 'view_academic_contribution' as view_publications %}
+              <a href="{{ view_publications }}" class="nav-link {% if request.path == view_publications %} active {% endif %}">
+                  <i class="nav-icon fas fa-scroll"></i>
+                  <p>
+                      Academic Contribution
+                  </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              {% url 'view_projects' as view_publications %}
+              <a href="{{ view_publications }}" class="nav-link {% if request.path == view_publications %} active {% endif %}">
+                  <i class="nav-icon fas fa-project-diagram"></i>
+                  <p>
+                      Projects
+                  </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'view_certifications' as view_certifications %}
+              <a href="{{ view_certifications }}" class="nav-link {% if request.path == view_certifications %} active {% endif %}">
+                  <i class="nav-icon fas fa-certificate"></i>
+                  <p>
+                      Certifications
+                  </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              {% url 'view_achievements' as view_achievements %}
+              <a href="{{ view_achievements }}" class="nav-link {% if request.path == view_achievements %} active {% endif %}">
+                  <i class="nav-icon fas fa-trophy"></i>
+                  <p>
+                      Achievements
+                  </p>
+              </a>
+            </li>
+
+            <!-- <li class="nav-item">
+              {% url 'view_journal' as view_publications %}
+              <a href="{{ view_publications }}" class="nav-link {% if request.path == view_publications %} active {% endif %}">
+                  <i class="nav-icon fas fa-newspaper"></i>
+                  <p>
+                      View Journal
+                  </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              {% url 'view_conference' as view_publications %}
+              <a href="{{ view_publications }}" class="nav-link {% if request.path == view_publications %} active {% endif %}">
+                  <i class="nav-icon fas fa-users"></i>
+                  <p>
+                      View Conference
+                  </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              {% url 'view_books' as view_publications %}
+              <a href="{{ view_publications }}" class="nav-link {% if request.path == view_publications %} active {% endif %}">
+                  <i class="nav-icon fas fa-book"></i>
+                  <p>
+                      View Books
+                  </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              {% url 'view_book_chapters' as view_book_chapters %}
+              <a href="{{ view_book_chapters }}" class="nav-link {% if request.path == view_book_chapters %} active {% endif %}">
+                  <i class="nav-icon fas fa-book-open"></i>
+                  <p>
+                      View Book Chapters
+                  </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              {% url 'view_copyrights' as view_copyrights %}
+              <a href="{{ view_copyrights }}" class="nav-link {% if request.path == view_copyrights %} active {% endif %}">
+                  <i class="nav-icon fas fa-balance-scale"></i>
+                  <p>
+                      View Copyrights
+                  </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              {% url 'view_patents' as view_patents %}
+              <a href="{{ view_patents }}" class="nav-link {% if request.path == view_patents %} active {% endif %}">
+                  <i class="nav-icon fas fa-balance-scale"></i>
+                  <p>
+                      View Patents
+                  </p>
+              </a>
+            </li> -->
+          </ul>
+        </nav>
+      </div>
+    </aside>

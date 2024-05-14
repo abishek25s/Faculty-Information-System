@@ -81,9 +81,9 @@ The Faculty Information System is designed to manage the details of faculty memb
 ## Acknowledgments
 This project was developed for the faculty of our college department to facilitate effective record management. The project was created by:
 
-[Abishek S](https://github.com/abishek25s)
-[Arumugam B](https://github.com/Arumugam-kishor)
-[Abishek KannuSwamy](https://github.com/AbishekKannuswamy)
+[Abishek S](https://github.com/abishek25s), 
+[Arumugam B](https://github.com/Arumugam-kishor), 
+[Abishek KannuSwamy](https://github.com/AbishekKannuswamy), 
 [Antony Gnanamuthu](link to profile)
 
 ## ScreenShots:

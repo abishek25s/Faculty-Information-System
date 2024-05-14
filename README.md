@@ -84,7 +84,7 @@ This project was developed for the faculty of our college department to facilita
 [Abishek S](https://github.com/abishek25s), 
 [Arumugam B](https://github.com/Arumugam-kishor), 
 [Abishek KannuSwamy](https://github.com/AbishekKannuswamy), 
-[Antony Gnanamuthu](link to profile)
+[Antony Gnanamuthu](https://github.com/ignitiusantony)
 
 ## ScreenShots:
 ![login](media/screenshots/lo.jpeg)

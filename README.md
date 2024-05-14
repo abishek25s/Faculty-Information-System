@@ -87,7 +87,10 @@ This project was developed for the faculty of our college department to facilita
 [Antony Gnanamuthu](link to profile)
 
 ## ScreenShots:
-
+![login](media/screenshots/lo.jpeg)
+![dashboard](media/screenshots/dash.jpeg)
+![staff profile](media/screenshots/sta.jpeg)
+![insights](media/screenshots/pie.jpeg)
 
 ## **Contact Information**
 For any questions or inquiries, please contact:
